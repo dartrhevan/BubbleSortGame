@@ -4,22 +4,18 @@ import android.animation.Animator
 import android.animation.Animator.AnimatorListener
 import android.animation.ObjectAnimator
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Rect
+import android.graphics.*
 import android.view.View
+import androidx.core.graphics.drawable.toBitmap
+import androidx.core.graphics.scale
 import com.example.bublesortgame.Model.Bubble
 import com.example.bublesortgame.Model.Game
 
-class GameField(context: Context?,private val game: Game) : View(context) {/*
-    init{
-        inflate(context, R.layout.activity_main, this)
-    }*/
+
+class GameField(context: Context?,private val game: Game = Game(0)) : View(context) {
     companion object {
         public val BubbleRecieversCount = 4
     }
-
     private var bubbleRadius : Int = 50
     private var animDuration : Int = 500
     private val bubbleAnims: ArrayList<Animator> = ArrayList()
@@ -38,16 +34,15 @@ class GameField(context: Context?,private val game: Game) : View(context) {/*
         //return anim
     }
     private val p = Paint()
+    private var slider = resources.getDrawable(R.drawable.slider,null).toBitmap()
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
         bubbleRadius = width / 4
-
-        //r.set(0, 0, width, 200)
         p.style = Paint.Style.FILL
         p.color = Color.GREEN
-        //canvas?.drawPaint(p)
         canvas?.drawRect(r, p)
-        //this.draw(canvas)
+        slider = slider.scale(300, 300)
+        canvas?.drawBitmap(slider, 0f,height.toFloat() - slider.height, null)
     }
 
     private var r = Rect(0, 0, 200, 200)
