@@ -15,13 +15,14 @@ import com.example.bublesortgame.Model.Game
 
 class MainActivity : AppCompatActivity() {
 
-    //private lateinit var child: GameField
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //setContentView(R.layout.activity_main)
-        setContentView(GameField(this))
+        val child = GameField(this)
+        //setContentView(GameField(this))
+        setContentView(R.layout.activity_main)
+        //setContentView(GameField(this))
         //setContentView(R.layout.sample_game_field)
-        //child.layoutParams = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT)
-        //cont.addView(child)
+        child.layoutParams = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT)
+        cont.addView(child)
     }
 }
