@@ -5,13 +5,16 @@ import kotlin.random.Random
 
 data class Slider(val game: Game, var X: Float = 0f) {
     private val r = Random(Date().time)
-    fun act(Y: Float) : Bubble? {
-        if(/*r.nextInt() % 10 == 0*/game.scores++ == 100) {
-            val element = Bubble(X,Y,Colour.BLUE,0)
+    fun act(Y: Float, rec : Receiver?) : Bubble? {
+        if(rec == null) return null
+        if(r.nextInt() % 2 == 0) {
+            val element = Bubble(rec.X ,Y,Colour.BLUE,rec.number)
             game.bubbles.add(element)
             return element
         }
         return null
     }
+    val centerX: Float
+    get() = X + Game.SliderWidth / 2
 
 }
