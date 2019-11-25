@@ -19,13 +19,14 @@ import com.example.bublesortgame.Model.Game
 import com.example.bublesortgame.Model.Slider
 import java.util.*
 import kotlin.collections.HashSet
+import kotlin.math.abs
 import kotlin.math.sqrt
 
 
 class GameField(context: Context?, private val game: Game = Game()) : View(context) {
 
     private var sliderAnimator: ObjectAnimator? = null
-    private var sliderDuration = 2000L
+    private var sliderDuration = 3000L
     private var _isPaused = false
     var isPaused
     get() = _isPaused
@@ -106,21 +107,24 @@ class GameField(context: Context?, private val game: Game = Game()) : View(conte
         private fun getDistance(x1: Float, y1:Float, x2: Float, y2: Float): Float = sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
     }
 
+    private fun getNearestLine(x: Float) : Int? = game.receivers.values.minBy { abs(x - it.centerX) }?.number
+
     private fun getTouchedBubble(x: Float, y: Float) : Bubble? = game.bubbles.firstOrNull { getDistance(x, y, it.getCentralX(bubbleDiametr.toFloat()),
         it.getCentralY(bubbleDiametr.toFloat())) <= bubbleDiametr * 3}
-
+/*
     private inner class GestureListener : SimpleOnGestureListener() {
         override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
             //this@GameField.isPaused = true
             val b = this@GameField.getTouchedBubble(e1.x, e1.y)
-            if(b != null)
-                if(e1.x - e2.x > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                    b.line--
+            //if(b != null)
+                b?.line = getNearestLine(e2.x)?: b?.line!!
+                /*if(e1.x - e2.x > SWIPE_MIN_DISTANCE && abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                    b.line = getNearestLine(e2.x)?: b.line
                     return false // справа налево
-                } else if(e2.x - e1.x > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                    b.line++
+                } else if(e2.x - e1.x > SWIPE_MIN_DISTANCE && abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                    b.line
                     return false // слева направо
-                }
+                }*/
 
             //this@GameField.isPaused = false
             /*
@@ -132,10 +136,19 @@ class GameField(context: Context?, private val game: Game = Game()) : View(conte
             return false
         }
     }
-
+*/
     init {
-        val gdt = GestureDetector(GestureListener())
-        setOnTouchListener{ v,e -> gdt.onTouchEvent(e); return@setOnTouchListener true; }
+        //val gdt = GestureDetector(GestureListener())
+        setOnTouchListener{ v,e ->
+            //if(true)
+            //{
+                val b = this@GameField.getTouchedBubble(e.x, e.y)
+                //b?.X = e.x
+                b?.line = getNearestLine(e.x)?: b?.line!!
+            //}
+            //gdt.onTouchEvent(e)
+            return@setOnTouchListener true
+        }
     }
 
     private fun initSliderAnim() {
@@ -146,10 +159,11 @@ class GameField(context: Context?, private val game: Game = Game()) : View(conte
         sliderAnimator!!.repeatCount = ValueAnimator.INFINITE
         timer.schedule(object : TimerTask() {
             override fun run() {
-                if(_isPaused) return
-                val bub = game.act(height - sliderBitmap.height.toFloat())
-                if(bub != null)
-                    addBubbleAnim(bub)
+                if(!_isPaused) {
+                    val bub = game.act(height - sliderBitmap.height.toFloat())
+                    if(bub != null)
+                        addBubbleAnim(bub)
+                }
                 this@GameField.invalidate()
             }
         }, 0, 15)
