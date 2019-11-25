@@ -8,7 +8,7 @@ data class Slider(val game: Game, var X: Float = 0f) {
     fun act(Y: Float, rec : Receiver?) : Bubble? {
         if(rec == null) return null
         if(r.nextInt() % 2 == 0) {
-            val element = Bubble(rec.X ,Y,Colour.BLUE,rec.number)
+            val element = Bubble(game/*, rec.X */,Y,Colour.BLUE,rec.number)
             game.bubbles.add(element)
             return element
         }
