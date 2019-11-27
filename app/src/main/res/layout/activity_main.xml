@@ -16,4 +16,15 @@
         android:background="@android:drawable/ic_media_pause"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:visibility="invisible"
+        android:id="@+id/restartBut"
+        android:layout_width="64dp"
+        android:layout_height="63dp"
+        android:background="@android:drawable/ic_menu_rotate"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -21,7 +21,7 @@ import kotlin.math.abs
 import kotlin.math.sqrt
 
 
-class GameField(context: Context?, private val game: Game = Game()) : View(context) {
+class GameField(context: Context?, private val onGameOver: ( ) -> Unit, private val game: Game = Game()) : View(context) {
 
     private val paints = mutableMapOf<Colour, Paint>()
     init {
@@ -46,7 +46,6 @@ class GameField(context: Context?, private val game: Game = Game()) : View(conte
         paints[Colour.RED] = r
     }
     private var sliderAnimator: ObjectAnimator? = null
-    private var sliderDuration = 1500L
     private var _isPaused = false
     var isPaused
     get() = _isPaused
@@ -68,13 +67,12 @@ class GameField(context: Context?, private val game: Game = Game()) : View(conte
     private val timer = Timer()
 
     private var bubbleDiametr = 0
-    private var animDuration = 2000L
     //val BubbleRecieversCount = 4
     private val animators: HashSet<Animator> = HashSet()
     private val bubbleAnims: ArrayList<Animator> = ArrayList()
     private fun addBubbleAnim(b: Bubble) {
         val an = ObjectAnimator.ofFloat(b,Bubble::Y.name,b.Y, /*-bubbleDiametr.toFloat()*/0f)
-        an.duration = animDuration
+        an.duration = Game.bubbleDuration
         an.addListener(object : AnimatorListener {
             override fun onAnimationRepeat(p0: Animator?) {}
             override fun onAnimationEnd(p0: Animator?) {
@@ -89,7 +87,18 @@ class GameField(context: Context?, private val game: Game = Game()) : View(conte
         //an.start()
     }
     fun gameOver() {
-        //isPaused = true
+        onGameOver()
+        sliderAnimator!!.pause()
+        //restartGame()
+        isPaused = true
+    }
+
+    fun restartGame() {
+        isPaused = false
+        animators.clear()
+        sliderAnimator!!.start()
+        bubbleAnims.clear()
+        game.restart()
     }
 
     private var sliderBitmap = resources.getDrawable(R.drawable.slider,null).toBitmap()
@@ -104,12 +113,9 @@ class GameField(context: Context?, private val game: Game = Game()) : View(conte
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-        if(animators != null)
-        {
             for(a in animators)
                 a.start()
             animators.clear()
-        }
         /*
         val p = Paint()
         p.style = Paint.Style.FILL
@@ -134,9 +140,9 @@ class GameField(context: Context?, private val game: Game = Game()) : View(conte
         }
     }
 
-    companion object {
+    companion object {/*
         private val SWIPE_MIN_DISTANCE = 120
-        private val SWIPE_THRESHOLD_VELOCITY = 200
+        private val SWIPE_THRESHOLD_VELOCITY = 200*/
         private fun getDistance(x1: Float, y1:Float, x2: Float, y2: Float): Float = sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
     }
 
@@ -147,6 +153,7 @@ class GameField(context: Context?, private val game: Game = Game()) : View(conte
 
     init {
         setOnTouchListener{ v,e ->
+                if(isPaused) return@setOnTouchListener true
                 val b = this@GameField.getTouchedBubble(e.x, e.y)
                 b?.line = getNearestLine(e.x)?: b?.line!!
             return@setOnTouchListener true
@@ -156,7 +163,7 @@ class GameField(context: Context?, private val game: Game = Game()) : View(conte
     private fun initSliderAnim() {
         if(sliderAnimator == null) {
         sliderAnimator = ObjectAnimator.ofFloat(game.slider,Slider::X.name,0f, width.toFloat() - sliderBitmap.width)
-        sliderAnimator!!.duration = sliderDuration
+        sliderAnimator!!.duration = Game.sliderDuration
         sliderAnimator!!.repeatMode = ValueAnimator.REVERSE
         sliderAnimator!!.repeatCount = ValueAnimator.INFINITE
         timer.schedule(object : TimerTask() {

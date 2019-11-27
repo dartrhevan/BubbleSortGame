@@ -14,6 +14,12 @@ class Game(var scores: Int = 0,var lives: Int = 5,val bubbles: ArrayList<Bubble>
         return lives < 0
     }
 
+    fun restart() {
+        bubbles.clear()
+        slider.X = 0f
+        scores = 0
+        lives = 5
+    }
 
     fun act(bottom: Float) : Bubble? {
         return slider.act(bottom, getReceiver())
@@ -26,6 +32,8 @@ class Game(var scores: Int = 0,var lives: Int = 5,val bubbles: ArrayList<Bubble>
     }
     companion object{
         private val DELTA = 5
+        var bubbleDuration = 2000L
+        var sliderDuration = 1500L
         var ReceiverWidth = 0
         var SliderWidth = 0
     }

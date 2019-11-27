@@ -9,7 +9,7 @@
             <shape android:shape="rectangle" >
                 <size android:width="35.46dp"
                     android:height="35.46dp" />
-                <solid android:color="#7b3f00"/>
+                <solid android:color="#404545"/>
             </shape></rotate>
     </item>
     <item
