@@ -4,11 +4,13 @@ import android.animation.Animator
 import android.animation.Animator.AnimatorListener
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
+import android.app.Activity
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.scale
 import com.example.bublesortgame.Model.Bubble
@@ -67,7 +69,6 @@ class GameField(context: Context?, private val onGameOver: ( ) -> Unit, private 
     private val timer = Timer()
 
     private var bubbleDiametr = 0
-    //val BubbleRecieversCount = 4
     private val animators: HashSet<Animator> = HashSet()
     private val bubbleAnims: ArrayList<Animator> = ArrayList()
     private fun addBubbleAnim(b: Bubble) {
@@ -78,20 +79,22 @@ class GameField(context: Context?, private val onGameOver: ( ) -> Unit, private 
             override fun onAnimationEnd(p0: Animator?) {
                 if(game.acceptBubble(b))
                     gameOver()
+                (context as AppCompatActivity).supportActionBar!!.title = "Scores: ${game.scores} Lives: ${game.lives}"
+                //context.actionBar!!.title = "Scores: 0 Lives: 5"
             }
             override fun onAnimationCancel(p0: Animator?) {}
             override fun onAnimationStart(p0: Animator?) {}
         })
         bubbleAnims.add(an)
         animators.add(an)
-        //an.start()
     }
     fun gameOver() {
         onGameOver()
         sliderAnimator!!.pause()
-        //restartGame()
         isPaused = true
     }
+    val scores: Int
+    get() = game.scores
 
     fun restartGame() {
         isPaused = false
@@ -99,10 +102,11 @@ class GameField(context: Context?, private val onGameOver: ( ) -> Unit, private 
         sliderAnimator!!.start()
         bubbleAnims.clear()
         game.restart()
+        (context as AppCompatActivity).supportActionBar!!.title = "Scores: ${game.scores} Lives: ${game.lives}"
     }
 
     private var sliderBitmap = resources.getDrawable(R.drawable.slider,null).toBitmap()
-    //private var receiverBitmap = resources.getDrawable(R.drawable.receiver_green,null).toBitmap()
+
     private val receiversBitmap = mapOf(Colour.GREEN to resources.getDrawable(R.drawable.receiver_green,null).toBitmap(),
         Colour.BLUE to resources.getDrawable(R.drawable.receiver_blue,null).toBitmap(),
         Colour.RED to resources.getDrawable(R.drawable.receiver_red,null).toBitmap(),
@@ -113,13 +117,9 @@ class GameField(context: Context?, private val onGameOver: ( ) -> Unit, private 
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-            for(a in animators)
-                a.start()
-            animators.clear()
-        /*
-        val p = Paint()
-        p.style = Paint.Style.FILL
-        p.color = Color.GREEN*/
+        for(a in animators)
+            a.start()
+        animators.clear()
         canvas?.drawBitmap(sliderBitmap, game.slider.X ,height.toFloat() - sliderBitmap.height, null)
         for ( b in game.bubbles)
             canvas!!.drawCircle(b.X + bubbleDiametr / 2, b.Y, bubbleDiametr.toFloat() / 2, paints[b.colour]!! )
@@ -140,9 +140,7 @@ class GameField(context: Context?, private val onGameOver: ( ) -> Unit, private 
         }
     }
 
-    companion object {/*
-        private val SWIPE_MIN_DISTANCE = 120
-        private val SWIPE_THRESHOLD_VELOCITY = 200*/
+    companion object {
         private fun getDistance(x1: Float, y1:Float, x2: Float, y2: Float): Float = sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
     }
 
