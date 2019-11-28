@@ -19,11 +19,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         //setContentView(R.layout.activity_main)
         gameField = GameField(this,{
-            pauseButton.isVisible = false// = View.INVISIBLE
-            //restartBut.visibility = View.VISIBLE
-            //results.visibility = View.VISIBLE
-            //results.text = "Your result is: ${gameField.scores}"
-            //Toast.makeText(this@MainActivity, "Your result is: ${gameField.scores}", Toast.LENGTH_LONG).show()
+            pauseButton.isVisible = false
             val builder = AlertDialog.Builder(this)
             builder.setTitle("Result")
                 .setMessage("Your result is: ${gameField.scores}\nRecords:\n")
@@ -33,17 +29,13 @@ class MainActivity : AppCompatActivity() {
                 .setNegativeButton("No") { dialog: DialogInterface,id1: Int -> dialog.cancel() }
             val alert = builder.create()
             //alert.show()
-        })/*
-        gameField.layoutParams = ConstraintLayout.LayoutParams(
-            ConstraintLayout.LayoutParams.MATCH_PARENT,
-            ConstraintLayout.LayoutParams.MATCH_PARENT
-        )
-        cont.addView(gameField)*/
+        })
         setContentView(gameField)
         pauseDrawable = resources.getDrawable(android.R.drawable.ic_media_pause)
         resumeDrawable = resources.getDrawable(android.R.drawable.ic_media_play)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         supportActionBar!!.title = "Scores: 0 Lives: 5"
+        gameField.isPaused = true
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -54,26 +46,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var resumeDrawable: Drawable
-    private lateinit var pauseDrawable: Drawable //= resources.getDrawable(android.R.drawable.ic_media_pause)
-/*
-    fun pause(view: View) {
-        gameField.isPaused = !gameField.isPaused
-        view.background = if(!gameField.isPaused) pauseDrawable else resumeDrawable
-    }*/
+    private lateinit var pauseDrawable: Drawable
+
 
     fun pause(item: MenuItem) {
-        /*when (item.itemId) {
-            R.id.button -> {*/
-                gameField.isPaused = !gameField.isPaused
-                item.icon = if(!gameField.isPaused) pauseDrawable else resumeDrawable
-            /*}
-            R.id.restartBut -> {
-                gameField.restartGame()
-                //item.visibility = View.INVISIBLE
-                results.visibility = View.INVISIBLE
-                //button.isVisible = true
-            }
-        }*/
+         gameField.isPaused = !gameField.isPaused
+         item.icon = if(!gameField.isPaused) pauseDrawable else resumeDrawable
     }
 
     fun restart(item: MenuItem) {
@@ -81,8 +59,6 @@ class MainActivity : AppCompatActivity() {
         gameField.restartGame()
         pauseButton.isVisible = true
         pauseButton.icon = pauseDrawable
-        //item.visibility = View.INVISIBLE
-//        results.visibility = View.INVISIBLE
     }
 }
 

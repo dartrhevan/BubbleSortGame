@@ -12,13 +12,14 @@ class Game(var scores: Int = 0,var lives: Int = 5,val bubbles: ArrayList<Bubble>
     val slider: Slider = Slider(this)
      fun acceptBubble(bubble: Bubble) : Boolean {
          if(!bubbles.contains(bubble)) return false
-        if(receivers[bubble.line]?.colour == bubble.colour)
+        if(receivers[bubble.line]?.colour == bubble.colour) {
             scores++
+            bubble.extraAction()
+        }
         else lives--
         bubbles.remove(bubble)
          if(!slider.megaBoost && (scores + 1) % speedUpFrequency == 0)
              speedUp()
-         bubble.extraAction()
         return lives < 0
     }
 

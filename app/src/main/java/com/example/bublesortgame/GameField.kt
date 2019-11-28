@@ -54,7 +54,7 @@ class GameField(context: Context?, private val onGameOver: ( ) -> Unit, private 
     set(value){
         _isPaused = value
         if(value) {
-            sliderAnimator!!.pause()
+            sliderAnimator?.pause()
             for(i in bubbleAnims)
                 i.pause()
         }
@@ -71,16 +71,17 @@ class GameField(context: Context?, private val onGameOver: ( ) -> Unit, private 
     private var bubbleDiametr = 0
     private val animators: HashSet<Animator> = HashSet()
     private val bubbleAnims: ArrayList<Animator> = ArrayList()
+
+    @Synchronized
     private fun addBubbleAnim(b: Bubble) {
         val an = ObjectAnimator.ofFloat(b,Bubble::Y.name,b.Y, /*-bubbleDiametr.toFloat()*/0f)
         an.duration = Game.bubbleDuration
         an.addListener(object : AnimatorListener {
             override fun onAnimationRepeat(p0: Animator?) {}
             override fun onAnimationEnd(p0: Animator?) {
-                //synchronized(b) {
                 if(game.acceptBubble(b))
                     gameOver()
-                //}
+
                 (context as AppCompatActivity).supportActionBar!!.title = "Scores: ${game.scores} Lives: ${game.lives}"
                 //context.actionBar!!.title = "Scores: 0 Lives: 5"
             }
@@ -94,6 +95,8 @@ class GameField(context: Context?, private val onGameOver: ( ) -> Unit, private 
         onGameOver()
         sliderAnimator!!.pause()
         isPaused = true
+        for(ba in bubbleAnims)
+            ba.cancel()
     }
     val scores: Int
     get() = game.scores
@@ -107,6 +110,7 @@ class GameField(context: Context?, private val onGameOver: ( ) -> Unit, private 
         (context as AppCompatActivity).supportActionBar!!.title = "Scores: ${game.scores} Lives: ${game.lives}"
     }
 
+    private var receiverBitmap = resources.getDrawable(R.drawable.receiver,null).toBitmap()
     private var sliderBitmap = resources.getDrawable(R.drawable.slider,null).toBitmap()
     private val textPaint = Paint()
     init {
@@ -114,15 +118,16 @@ class GameField(context: Context?, private val onGameOver: ( ) -> Unit, private 
         textPaint.color = Color.GRAY
         textPaint.textAlign = Paint.Align.CENTER
     }
-
+/*
     private val receiversBitmap = mapOf(Colour.GREEN to resources.getDrawable(R.drawable.receiver_green,null).toBitmap(),
         Colour.BLUE to resources.getDrawable(R.drawable.receiver_blue,null).toBitmap(),
         Colour.RED to resources.getDrawable(R.drawable.receiver_red,null).toBitmap(),
         Colour.YELLOW to resources.getDrawable(R.drawable.receiver_yel,null).toBitmap())
     init{
         Game.ReceiverWidth = receiversBitmap[Colour.YELLOW]!!.width
-    }
+    }*/
 
+    @Synchronized
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
         for(a in animators)
@@ -130,16 +135,16 @@ class GameField(context: Context?, private val onGameOver: ( ) -> Unit, private 
         animators.clear()
         canvas?.drawBitmap(sliderBitmap, game.slider.X ,height.toFloat() - sliderBitmap.height, null)
 
-        synchronized(game.bubbles) {
+        //synchronized(game.bubbles) {
         for(b in game.bubbles) {
-            synchronized(b) {
-                canvas!!.drawCircle(b.X + bubbleDiametr / 2, b.Y,bubbleDiametr / 2f,paints[b.colour]!!)
-                canvas.drawText(b.label,b.X + bubbleDiametr / 2,b.Y + bubbleDiametr * 0.125f,textPaint)
+            canvas!!.drawText(b.label,b.X + bubbleDiametr / 2,b.Y + bubbleDiametr * 0.125f,textPaint)
+            canvas.drawCircle(b.X + bubbleDiametr / 2, b.Y,bubbleDiametr / 2f,paints[b.colour]!!)
             }
+        //}
+        for(r in game.receivers) {
+            canvas!!.drawRect(r.value.X + 2, 0f,r.value.X + receiverBitmap.width, receiverBitmap.height.toFloat() ,paints[r.value.colour]!!)
+            canvas.drawBitmap(receiverBitmap,r.value.X,0f,null)
         }
-        }
-        for(r in game.receivers)
-            canvas!!.drawBitmap(receiversBitmap[r.value.colour]!!, r.value.X, 0f, null)
     }
 
     override fun onSizeChanged(w: Int,h: Int,oldw: Int,oldh: Int) {
@@ -148,8 +153,10 @@ class GameField(context: Context?, private val onGameOver: ( ) -> Unit, private 
         bubbleDiametr = width / 8
         sliderBitmap = sliderBitmap.scale(bubbleDiametr, bubbleDiametr)
         Game.SliderWidth = sliderBitmap.width
+        Game.ReceiverWidth = Game.SliderWidth
+        receiverBitmap = receiverBitmap.scale(Game.SliderWidth, Game.SliderWidth)
             for(r in game.receivers)
-                r.value.X = r.key * bubbleDiametr * 2f + (bubbleDiametr * 2f - Game.ReceiverWidth) / 2
+                r.value.X = r.key * bubbleDiametr * 2f + (bubbleDiametr * 2f - Game.ReceiverWidth) / 2f
     }
 
     companion object {
@@ -187,6 +194,7 @@ class GameField(context: Context?, private val onGameOver: ( ) -> Unit, private 
             }
         }, 0, 15)
         sliderAnimator!!.start()
+        sliderAnimator!!.pause()
         }
     }
 }

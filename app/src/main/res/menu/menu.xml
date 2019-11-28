@@ -11,7 +11,7 @@
         app:showAsAction="ifRoom|withText">
     </item>
     <item
-        android:icon="@android:drawable/ic_media_pause"
+        android:icon="@android:drawable/ic_media_play"
         android:onClick="pause"
         android:id="@+id/button"
         android:title=""
