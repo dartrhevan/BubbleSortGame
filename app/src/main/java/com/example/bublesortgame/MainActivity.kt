@@ -66,6 +66,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun restart(item: MenuItem) {
+        gameField.gameOver()
         gameField.restartGame()
         pauseButton.isVisible = true
         pauseButton.icon = pauseDrawable

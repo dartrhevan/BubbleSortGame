@@ -77,8 +77,10 @@ class GameField(context: Context?, private val onGameOver: ( ) -> Unit, private 
         an.addListener(object : AnimatorListener {
             override fun onAnimationRepeat(p0: Animator?) {}
             override fun onAnimationEnd(p0: Animator?) {
+                //synchronized(b) {
                 if(game.acceptBubble(b))
                     gameOver()
+                //}
                 (context as AppCompatActivity).supportActionBar!!.title = "Scores: ${game.scores} Lives: ${game.lives}"
                 //context.actionBar!!.title = "Scores: 0 Lives: 5"
             }
@@ -97,13 +99,12 @@ class GameField(context: Context?, private val onGameOver: ( ) -> Unit, private 
     get() = game.scores
 
     fun restartGame() {
-        sliderAnimator!!.pause()
         isPaused = false
         animators.clear()
+        sliderAnimator!!.start()
         bubbleAnims.clear()
         game.restart()
         (context as AppCompatActivity).supportActionBar!!.title = "Scores: ${game.scores} Lives: ${game.lives}"
-        sliderAnimator!!.start()
     }
 
     private var sliderBitmap = resources.getDrawable(R.drawable.slider,null).toBitmap()
@@ -151,11 +152,8 @@ class GameField(context: Context?, private val onGameOver: ( ) -> Unit, private 
         bubbleDiametr = width / 8
         sliderBitmap = sliderBitmap.scale(bubbleDiametr, bubbleDiametr)
         Game.SliderWidth = sliderBitmap.width
-
-        synchronized(game.bubbles) {
             for(r in game.receivers)
                 r.value.X = r.key * bubbleDiametr * 2f + (bubbleDiametr * 2f - Game.ReceiverWidth) / 2
-        }
     }
 
     companion object {

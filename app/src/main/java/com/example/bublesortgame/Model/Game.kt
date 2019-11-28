@@ -11,6 +11,7 @@ class Game(var scores: Int = 0,var lives: Int = 5,val bubbles: ArrayList<Bubble>
                    Receiver(2, Colour.GREEN), 3 to Receiver(3, Colour.YELLOW))) {
     val slider: Slider = Slider(this)
      fun acceptBubble(bubble: Bubble) : Boolean {
+         if(!bubbles.contains(bubble)) return false
         if(receivers[bubble.line]?.colour == bubble.colour)
             scores++
         else lives--
