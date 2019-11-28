@@ -97,15 +97,22 @@ class GameField(context: Context?, private val onGameOver: ( ) -> Unit, private 
     get() = game.scores
 
     fun restartGame() {
+        sliderAnimator!!.pause()
         isPaused = false
         animators.clear()
-        sliderAnimator!!.start()
         bubbleAnims.clear()
         game.restart()
         (context as AppCompatActivity).supportActionBar!!.title = "Scores: ${game.scores} Lives: ${game.lives}"
+        sliderAnimator!!.start()
     }
 
     private var sliderBitmap = resources.getDrawable(R.drawable.slider,null).toBitmap()
+    private val textPaint = Paint()
+    init {
+        textPaint.textSize = 50f
+        textPaint.color = Color.GRAY
+        textPaint.textAlign = Paint.Align.CENTER
+    }
 
     private val receiversBitmap = mapOf(Colour.GREEN to resources.getDrawable(R.drawable.receiver_green,null).toBitmap(),
         Colour.BLUE to resources.getDrawable(R.drawable.receiver_blue,null).toBitmap(),
@@ -121,8 +128,19 @@ class GameField(context: Context?, private val onGameOver: ( ) -> Unit, private 
             a.start()
         animators.clear()
         canvas?.drawBitmap(sliderBitmap, game.slider.X ,height.toFloat() - sliderBitmap.height, null)
-        for ( b in game.bubbles)
-            canvas!!.drawCircle(b.X + bubbleDiametr / 2, b.Y, bubbleDiametr.toFloat() / 2, paints[b.colour]!! )
+
+        synchronized(game.bubbles) {
+        for(b in game.bubbles) {
+            synchronized(b) {
+                canvas!!.drawCircle(
+                    b.X + bubbleDiametr / 2,
+                    b.Y,
+                    bubbleDiametr / 2f,
+                    paints[b.colour]!!
+                )
+                canvas.drawText("0",b.X + bubbleDiametr / 2,b.Y + bubbleDiametr * 0.125f,textPaint)
+            }
+        }}
         for(r in game.receivers)
             canvas!!.drawBitmap(receiversBitmap[r.value.colour]!!, r.value.X, 0f, null)
     }
