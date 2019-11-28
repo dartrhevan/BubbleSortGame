@@ -133,15 +133,11 @@ class GameField(context: Context?, private val onGameOver: ( ) -> Unit, private 
         synchronized(game.bubbles) {
         for(b in game.bubbles) {
             synchronized(b) {
-                canvas!!.drawCircle(
-                    b.X + bubbleDiametr / 2,
-                    b.Y,
-                    bubbleDiametr / 2f,
-                    paints[b.colour]!!
-                )
-                canvas.drawText("0",b.X + bubbleDiametr / 2,b.Y + bubbleDiametr * 0.125f,textPaint)
+                canvas!!.drawCircle(b.X + bubbleDiametr / 2, b.Y,bubbleDiametr / 2f,paints[b.colour]!!)
+                canvas.drawText(b.label,b.X + bubbleDiametr / 2,b.Y + bubbleDiametr * 0.125f,textPaint)
             }
-        }}
+        }
+        }
         for(r in game.receivers)
             canvas!!.drawBitmap(receiversBitmap[r.value.colour]!!, r.value.X, 0f, null)
     }

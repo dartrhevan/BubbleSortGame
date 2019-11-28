@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 .setNegativeButton("No") { dialog: DialogInterface,id1: Int -> dialog.cancel() }
             val alert = builder.create()
-            alert.show()
+            //alert.show()
         })/*
         gameField.layoutParams = ConstraintLayout.LayoutParams(
             ConstraintLayout.LayoutParams.MATCH_PARENT,

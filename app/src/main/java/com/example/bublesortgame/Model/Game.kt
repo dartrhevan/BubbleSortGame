@@ -18,6 +18,7 @@ class Game(var scores: Int = 0,var lives: Int = 5,val bubbles: ArrayList<Bubble>
         bubbles.remove(bubble)
          if(!slider.megaBoost && (scores + 1) % speedUpFrequency == 0)
              speedUp()
+         bubble.extraAction()
         return lives < 0
     }
 
