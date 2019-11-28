@@ -1,14 +1,14 @@
 package com.example.bublesortgame
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.pm.ActivityInfo
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
-import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -17,18 +17,29 @@ class MainActivity : AppCompatActivity() {
     private lateinit var gameField: GameField
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        //setContentView(R.layout.activity_main)
         gameField = GameField(this,{
             pauseButton.isVisible = false// = View.INVISIBLE
             //restartBut.visibility = View.VISIBLE
-            results.visibility = View.VISIBLE
-            results.text = "Your result is: ${gameField.scores}"
-        })
+            //results.visibility = View.VISIBLE
+            //results.text = "Your result is: ${gameField.scores}"
+            //Toast.makeText(this@MainActivity, "Your result is: ${gameField.scores}", Toast.LENGTH_LONG).show()
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Result")
+                .setMessage("Your result is: ${gameField.scores}\nRecords:\n")
+                .setCancelable(false)
+                .setPositiveButton("Yes") { dialog: DialogInterface?,which: Int ->
+                }
+                .setNegativeButton("No") { dialog: DialogInterface,id1: Int -> dialog.cancel() }
+            val alert = builder.create()
+            alert.show()
+        })/*
         gameField.layoutParams = ConstraintLayout.LayoutParams(
             ConstraintLayout.LayoutParams.MATCH_PARENT,
             ConstraintLayout.LayoutParams.MATCH_PARENT
         )
-        cont.addView(gameField)
+        cont.addView(gameField)*/
+        setContentView(gameField)
         pauseDrawable = resources.getDrawable(android.R.drawable.ic_media_pause)
         resumeDrawable = resources.getDrawable(android.R.drawable.ic_media_play)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
@@ -71,7 +82,7 @@ class MainActivity : AppCompatActivity() {
         pauseButton.isVisible = true
         pauseButton.icon = pauseDrawable
         //item.visibility = View.INVISIBLE
-        results.visibility = View.INVISIBLE
+//        results.visibility = View.INVISIBLE
     }
 }
 
