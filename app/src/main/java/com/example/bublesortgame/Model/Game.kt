@@ -1,17 +1,18 @@
 package com.example.bublesortgame.Model
 
 import java.util.*
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.collections.ArrayList
 import kotlin.math.abs
 import kotlin.math.round
 import kotlin.random.Random
 
-class Game(var scores: Int = 0,var lives: Int = 5,val bubbles: ArrayList<Bubble> = arrayListOf(/*Bubble(200f, 300f, Colour.YELLOW, 0)*/),val receivers : Map<Int, Receiver> =
-               mapOf(0 to Receiver(0, Colour.BLUE), 1 to Receiver(1, Colour.RED), 2 to
+class Game(var scores: Int = 0,var lives: Int = 5,val bubbles: CopyOnWriteArrayList<Bubble> = CopyOnWriteArrayList()/*MutableList<Bubble> = Collections.synchronizedList(ArrayList<Bubble>())*/,
+           val receivers : Map<Int, Receiver> =  mapOf(0 to Receiver(0, Colour.BLUE), 1 to Receiver(1, Colour.RED), 2 to
                    Receiver(2, Colour.GREEN), 3 to Receiver(3, Colour.YELLOW))) {
     val slider: Slider = Slider(this)
      fun acceptBubble(bubble: Bubble) : Boolean {
-         if(!bubbles.contains(bubble)) return false
+        if(!bubbles.contains(bubble)) return false
         if(receivers[bubble.line]?.colour == bubble.colour) {
             scores++
             bubble.extraAction()
@@ -29,6 +30,7 @@ class Game(var scores: Int = 0,var lives: Int = 5,val bubbles: ArrayList<Bubble>
         bubbles.clear()
         slider.X = 0f
         scores = 0
+        slider.megaBoost = false
         lives = 5
     }
 

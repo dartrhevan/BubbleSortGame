@@ -72,7 +72,7 @@ class GameField(context: Context?, private val onGameOver: ( ) -> Unit, private 
     private val animators: HashSet<Animator> = HashSet()
     private val bubbleAnims: ArrayList<Animator> = ArrayList()
 
-    @Synchronized
+    //@Synchronized
     private fun addBubbleAnim(b: Bubble) {
         val an = ObjectAnimator.ofFloat(b,Bubble::Y.name,b.Y, /*-bubbleDiametr.toFloat()*/0f)
         an.duration = Game.bubbleDuration
@@ -127,7 +127,7 @@ class GameField(context: Context?, private val onGameOver: ( ) -> Unit, private 
         Game.ReceiverWidth = receiversBitmap[Colour.YELLOW]!!.width
     }*/
 
-    @Synchronized
+    //@Synchronized
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
         for(a in animators)
@@ -137,8 +137,8 @@ class GameField(context: Context?, private val onGameOver: ( ) -> Unit, private 
 
         //synchronized(game.bubbles) {
         for(b in game.bubbles) {
-            canvas!!.drawText(b.label,b.X + bubbleDiametr / 2,b.Y + bubbleDiametr * 0.125f,textPaint)
-            canvas.drawCircle(b.X + bubbleDiametr / 2, b.Y,bubbleDiametr / 2f,paints[b.colour]!!)
+            canvas!!.drawCircle(b.X + bubbleDiametr / 2, b.Y,bubbleDiametr / 2f,paints[b.colour]!!)
+            canvas.drawText(b.label,b.X + bubbleDiametr / 2,b.Y + bubbleDiametr * 0.125f,textPaint)
             }
         //}
         for(r in game.receivers) {
