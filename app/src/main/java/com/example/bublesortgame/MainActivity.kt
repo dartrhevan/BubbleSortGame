@@ -9,6 +9,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.bublesortgame.results.ResultsDialog
 
 
 class MainActivity : AppCompatActivity() {
@@ -18,8 +19,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //setContentView(R.layout.activity_main)
-        gameField = GameField(this,{
-            pauseButton.isVisible = false
+        gameField = GameField(this,{ s ->
+            pauseButton.isVisible = false/*
             val builder = AlertDialog.Builder(this)
             builder.setTitle("Result")
                 .setMessage("Your result is: ${gameField.scores}\nRecords:\n")
@@ -27,9 +28,13 @@ class MainActivity : AppCompatActivity() {
                 .setPositiveButton("Yes") { dialog: DialogInterface?,which: Int ->
                 }
                 .setNegativeButton("No") { dialog: DialogInterface,id1: Int -> dialog.cancel() }
-            val alert = builder.create()
+            val alert = builder.create()*/
+            if(s) {
+            val dialog = ResultsDialog(this, gameField.scores)
+            dialog.show()}
             //alert.show()
         })
+
         setContentView(gameField)
         pauseDrawable = resources.getDrawable(android.R.drawable.ic_media_pause)
         resumeDrawable = resources.getDrawable(android.R.drawable.ic_media_play)
@@ -55,7 +60,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun restart(item: MenuItem) {
-        gameField.gameOver()
+        gameField.gameOver(false)
         gameField.restartGame()
         pauseButton.isVisible = true
         pauseButton.icon = pauseDrawable

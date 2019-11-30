@@ -23,7 +23,7 @@ import kotlin.math.abs
 import kotlin.math.sqrt
 
 
-class GameField(context: Context?, private val onGameOver: ( ) -> Unit, private val game: Game = Game()) : View(context) {
+class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit, private val game: Game = Game()) : View(context) {
 
     private val paints = mutableMapOf<Colour, Paint>()
     init {
@@ -91,8 +91,8 @@ class GameField(context: Context?, private val onGameOver: ( ) -> Unit, private 
         bubbleAnims.add(an)
         animators.add(an)
     }
-    fun gameOver() {
-        onGameOver()
+    fun gameOver(showDialog: Boolean = true) {
+        onGameOver(showDialog)
         sliderAnimator!!.pause()
         isPaused = true
         for(ba in bubbleAnims)
