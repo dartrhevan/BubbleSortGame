@@ -50,8 +50,9 @@ class ResultsDialog(context: Context, result: Int) : AlertDialog.Builder(context
 
                 if(records.count() == 0  || records[0].scores < result)
                 db.addResult(Result(result, editText.text.toString()))
+                db.close()
                 dialog!!.cancel()
             }
-            .setNegativeButton(R.string.cancel, null)
+            //.setNegativeButton(R.string.cancel, null)
     }
 }

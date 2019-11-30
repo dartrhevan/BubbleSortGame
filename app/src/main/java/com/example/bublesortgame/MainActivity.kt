@@ -3,8 +3,11 @@ package com.example.bublesortgame
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.pm.ActivityInfo
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.text.Html
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -30,23 +33,28 @@ class MainActivity : AppCompatActivity() {
                 .setNegativeButton("No") { dialog: DialogInterface,id1: Int -> dialog.cancel() }
             val alert = builder.create()*/
             if(s) {
-            val dialog = ResultsDialog(this, gameField.scores)
-            dialog.show()}
+                val dialog = ResultsDialog(this, gameField.scores)
+                dialog.show()
+            }
             //alert.show()
         })
-
+        gameField.background = ColorDrawable(Color.parseColor("#AAAAAA"))
         setContentView(gameField)
         pauseDrawable = resources.getDrawable(android.R.drawable.ic_media_pause)
         resumeDrawable = resources.getDrawable(android.R.drawable.ic_media_play)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         supportActionBar!!.title = "Scores: 0 Lives: 5"
+        supportActionBar!!.setBackgroundDrawable(ColorDrawable(Color.parseColor("#444444")))
+        //supportActionBar!!.title = Html.fromHtml("<font color=\"red\">Scores: 0 Lives: 5</font>")//"Scores: 0 Lives: 5"
         gameField.isPaused = true
+
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater = menuInflater
         inflater.inflate(R.menu.menu,menu)
-        pauseButton = menu!!.getItem(1)
+        pauseButton = menu!!.getItem(2)
         return true
     }
 
@@ -64,6 +72,11 @@ class MainActivity : AppCompatActivity() {
         gameField.restartGame()
         pauseButton.isVisible = true
         pauseButton.icon = pauseDrawable
+    }
+
+    fun results(item: MenuItem) {
+        val dialog = ResultsDialog(this, -1)
+        dialog.show()
     }
 }
 

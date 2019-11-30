@@ -4,6 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <item
+        android:id="@+id/resultsBut"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:onClick="results"
+        android:title=""
+        app:showAsAction="ifRoom|withText"></item>
+    <item
         android:id="@+id/restartBut"
         android:icon="@android:drawable/ic_menu_rotate"
         android:title=""

@@ -23,13 +23,18 @@ class DBResultsProvider(ct: Context)
         val res = ArrayList<Result>()
         val query = db.rawQuery("SELECT * FROM results ORDER BY scores DESC",null)
         if(query.moveToFirst())
-        for(i in 0..9) {
-            res.add(Result(query.getInt(2),query.getString(1),Date(query.getLong(3))))
-            if(!query.moveToNext()) break
-        }
+        //for(i in 0..9) {
+            do {
+                if(res.count() <= 10)
+                res.add(Result(query.getInt(2),query.getString(1),Date(query.getLong(3))))
+                else db.execSQL("DELETE FROM results WHERE id = ${query.getInt(0)}")
+            } while(query.moveToNext())
+        //}
         query.close()
         return res
     }
+    fun close() = db.close()
+
     /*
     companion object {
         private var instance: DBProvider? = null

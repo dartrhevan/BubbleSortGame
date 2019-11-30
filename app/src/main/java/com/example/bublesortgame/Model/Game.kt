@@ -21,7 +21,7 @@ class Game(var scores: Int = 0,var lives: Int = 5,val bubbles: CopyOnWriteArrayL
         bubbles.remove(bubble)
          if(!slider.megaBoost && (scores + 1) % speedUpFrequency == 0)
              speedUp()
-        return lives < 0
+        return lives == 0
     }
 
     fun restart() {
