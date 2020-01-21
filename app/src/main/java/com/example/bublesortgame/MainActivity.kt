@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         pauseDrawable = resources.getDrawable(android.R.drawable.ic_media_pause)
         resumeDrawable = resources.getDrawable(android.R.drawable.ic_media_play)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        supportActionBar!!.title = "Scores: 0 Lives: 5"
+        supportActionBar!!.title = "S 0 L 5"
         supportActionBar!!.setBackgroundDrawable(ColorDrawable(Color.parseColor("#444444")))
         //supportActionBar!!.title = Html.fromHtml("<font color=\"red\">Scores: 0 Lives: 5</font>")//"Scores: 0 Lives: 5"
         gameField.isPaused = true

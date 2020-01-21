@@ -9,6 +9,8 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.text.method.Touch
+import android.view.MotionEvent
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.drawable.toBitmap
@@ -82,7 +84,7 @@ class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit,
                 if(game.acceptBubble(b))
                     gameOver()
 
-                (context as AppCompatActivity).supportActionBar!!.title = "Scores: ${game.scores} Lives: ${game.lives}"
+                (context as AppCompatActivity).supportActionBar!!.title = "S ${game.scores} L ${game.lives}"
                 //context.actionBar!!.title = "Scores: 0 Lives: 5"
             }
             override fun onAnimationCancel(p0: Animator?) {}
@@ -107,7 +109,7 @@ class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit,
         sliderAnimator!!.start()
         bubbleAnims.clear()
         game.restart()
-        (context as AppCompatActivity).supportActionBar!!.title = "Scores: ${game.scores} Lives: ${game.lives}"
+        (context as AppCompatActivity).supportActionBar!!.title = "S ${game.scores} L ${game.lives}"
     }
 
     private var receiverBitmap = resources.getDrawable(R.drawable.receiver,null).toBitmap()
@@ -165,14 +167,27 @@ class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit,
 
     private fun getNearestLine(x: Float) : Int? = game.receivers.values.minBy { abs(x - it.centerX) }?.number
 
-    private fun getTouchedBubble(x: Float, y: Float) : Bubble? = game.bubbles.firstOrNull { getDistance(x, y, it.getCentralX(bubbleDiametr.toFloat()),
-        it.getCentralY(bubbleDiametr.toFloat())) <= bubbleDiametr * 2.5}
+    private fun getTouchedBubble(x: Float, y: Float, radius: Float = 2.35f) : Bubble? = game.bubbles.firstOrNull { getDistance(x, y, it.getCentralX(bubbleDiametr.toFloat()),
+        it.getCentralY(bubbleDiametr.toFloat())) <= bubbleDiametr *  radius}
+
+
+    private fun getTouchedBubble2(x: Float, y: Float) : Bubble? =
+        game.bubbles.firstOrNull { abs(y - it.getCentralY(bubbleDiametr.toFloat())) <= bubbleDiametr * 2
+                && abs(x - it.getCentralX(bubbleDiametr.toFloat())) <= bubbleDiametr * 1.5}
 
     init {
         setOnTouchListener{ v,e ->
-                if(isPaused) return@setOnTouchListener true
-                val b = this@GameField.getTouchedBubble(e.x, e.y)
+            //(context as MainActivity).supportActionBar!!.title = e.action.toString().
+            if(isPaused) return@setOnTouchListener true
+            if(e.action == MotionEvent.ACTION_DOWN)
+            {
+                val b = this@GameField.getTouchedBubble2(e.x, e.y)
                 b?.line = getNearestLine(e.x)?: b?.line!!
+            }
+            else/*if(e.action == MotionEvent.ACTION_MOVE) */{
+                val b = this@GameField.getTouchedBubble(e.x, e.y )//if(e.action == MotionEvent.ACTION_MOVE) 2.35f else if(e.action == MotionEvent.ACTION_DOWN) 1.3f else 0f)
+                b?.line = getNearestLine(e.x)?: b?.line!!
+            }
             return@setOnTouchListener true
         }
     }
