@@ -20,6 +20,7 @@ import com.example.bublesortgame.Model.Colour
 import com.example.bublesortgame.Model.Game
 import com.example.bublesortgame.Model.Slider
 import java.util.*
+import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 import kotlin.math.abs
 import kotlin.math.sqrt
@@ -48,7 +49,22 @@ class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit,
         r.style = Paint.Style.FILL
         r.color = Color.RED
         paints[Colour.RED] = r
+
+
     }
+    private val shadowedPaints = paints.map {
+        val p = Paint()
+        p.style = it.value.style
+        p.color = it.value.color
+        p.setShadowLayer(15f, 0f, 0f, it.value.color)
+        it.key to p
+    }.toMap()
+
+    init {
+        //shadowedPaints.forEach { it.value.setShadowLayer(15f, 0f, 0f, it.value.color)}
+        this.setLayerType(LAYER_TYPE_SOFTWARE, null)
+    }
+
     private var sliderAnimator: ObjectAnimator? = null
     private var _isPaused = false
     var isPaused
@@ -73,7 +89,7 @@ class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit,
     private var bubbleDiametr = 0
     private val animators: HashSet<Animator> = HashSet()
     private val bubbleAnims: ArrayList<Animator> = ArrayList()
-
+    private val animatedReceivers = HashSet<Int>()
     //@Synchronized
     private fun addBubbleAnim(b: Bubble) {
         val an = ObjectAnimator.ofFloat(b,Bubble::Y.name,b.Y, /*-bubbleDiametr.toFloat()*/0f)
@@ -83,8 +99,15 @@ class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit,
             override fun onAnimationEnd(p0: Animator?) {
                 if(game.acceptBubble(b))
                     gameOver()
-
                 (context as AppCompatActivity).supportActionBar!!.title = "S ${game.scores} L ${game.lives}"
+                animatedReceivers.add(b.line)
+                timer.schedule(object : TimerTask() {
+                    override fun run() {
+                        animatedReceivers.remove(b.line)
+                    }
+
+                }, 250)
+
                 //context.actionBar!!.title = "Scores: 0 Lives: 5"
             }
             override fun onAnimationCancel(p0: Animator?) {}
@@ -144,7 +167,12 @@ class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit,
             }
         //}
         for(r in game.receivers) {
-            canvas!!.drawRect(r.value.X + 2, 0f,r.value.X + receiverBitmap.width, receiverBitmap.height.toFloat() ,paints[r.value.colour]!!)
+            /*val p = Paint()
+            p.setShadowLayer(30f, 5f, 5f, Color.RED)
+            p.color = Color.WHITE
+            p.style = Paint.Style.FILL*/
+            canvas!!.drawRect(r.value.X + 2, 0f,r.value.X + receiverBitmap.width, receiverBitmap.height.toFloat() ,
+                if(animatedReceivers.contains(r.key)) shadowedPaints[r.value.colour]!! else paints[r.value.colour]!!)
             canvas.drawBitmap(receiverBitmap,r.value.X,0f,null)
         }
     }
