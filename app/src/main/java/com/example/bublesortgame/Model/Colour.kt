@@ -1,8 +1,11 @@
 package com.example.bublesortgame.Model
 
-enum class Colour {
-    RED,
-    GREEN,
-    BLUE,
-    YELLOW
+import android.graphics.Color
+
+enum class Colour(val color: Int) {
+    RED(Color.RED),
+    GREEN(Color.GREEN),
+    BLUE(Color.BLUE),
+    YELLOW(Color.YELLOW);
+
 }

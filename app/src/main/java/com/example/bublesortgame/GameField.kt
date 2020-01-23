@@ -4,14 +4,13 @@ import android.animation.Animator
 import android.animation.Animator.AnimatorListener
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
-import android.app.Activity
+import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.text.method.Touch
+import android.graphics.*
+import android.graphics.drawable.ColorDrawable
 import android.view.MotionEvent
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.scale
@@ -20,7 +19,6 @@ import com.example.bublesortgame.Model.Colour
 import com.example.bublesortgame.Model.Game
 import com.example.bublesortgame.Model.Slider
 import java.util.*
-import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 import kotlin.math.abs
 import kotlin.math.sqrt
@@ -90,7 +88,12 @@ class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit,
     private val animators: HashSet<Animator> = HashSet()
     private val bubbleAnims: ArrayList<Animator> = ArrayList()
     private val animatedReceivers = HashSet<Int>()
+    private val radiancePaint : Paint = Paint()
+    init {
+        radiancePaint.color = Color.BLACK
+    }
     //@Synchronized
+    @SuppressLint("NewApi")
     private fun addBubbleAnim(b: Bubble) {
         val an = ObjectAnimator.ofFloat(b,Bubble::Y.name,b.Y, /*-bubbleDiametr.toFloat()*/0f)
         an.duration = Game.bubbleDuration
@@ -115,7 +118,18 @@ class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit,
         })
         bubbleAnims.add(an)
         animators.add(an)
+
+        radiancePaint.setShadowLayer(15f, 0f, 0f, b.colour.color)
+        sliderTimer.purge()
+        sliderTimer.schedule(object : TimerTask() {
+            override fun run() {
+                radiancePaint.clearShadowLayer()
+                /*animatedReceivers.remove(b.line)*/
+            }
+        }, 250)
     }
+
+    private val sliderTimer = Timer()
     fun gameOver(showDialog: Boolean = true) {
         onGameOver(showDialog)
         sliderAnimator!!.pause()
@@ -134,9 +148,9 @@ class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit,
         game.restart()
         (context as AppCompatActivity).supportActionBar!!.title = "S ${game.scores} L ${game.lives}"
     }
-
     private var receiverBitmap = resources.getDrawable(R.drawable.receiver,null).toBitmap()
     private var sliderBitmap = resources.getDrawable(R.drawable.slider,null).toBitmap()
+    //private val radianceBitmap = ColorDrawable(Color.BLACK).toBitmap(sliderBitmap.width, 1)
     private val textPaint = Paint()
     init {
         textPaint.textSize = 50f
@@ -158,8 +172,8 @@ class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit,
         for(a in animators)
             a.start()
         animators.clear()
+        canvas?.drawRect(game.slider.X ,height.toFloat() - sliderBitmap.height, game.slider.X + sliderBitmap.width,height.toFloat() - sliderBitmap.height + 10f, radiancePaint)//
         canvas?.drawBitmap(sliderBitmap, game.slider.X ,height.toFloat() - sliderBitmap.height, null)
-
         //synchronized(game.bubbles) {
         for(b in game.bubbles) {
             canvas!!.drawCircle(b.X + bubbleDiametr / 2, b.Y,bubbleDiametr / 2f,paints[b.colour]!!)
@@ -195,13 +209,13 @@ class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit,
 
     private fun getNearestLine(x: Float) : Int? = game.receivers.values.minBy { abs(x - it.centerX) }?.number
 
-    private fun getTouchedBubble(x: Float, y: Float, radius: Float = 2.35f) : Bubble? = game.bubbles.firstOrNull { getDistance(x, y, it.getCentralX(bubbleDiametr.toFloat()),
+    private fun getTouchingBubble(x: Float,y: Float,radius: Float = 2.35f) : Bubble? = game.bubbles.firstOrNull { getDistance(x, y, it.getCentralX(bubbleDiametr.toFloat()),
         it.getCentralY(bubbleDiametr.toFloat())) <= bubbleDiametr *  radius}
 
 
-    private fun getTouchedBubble2(x: Float, y: Float) : Bubble? =
-        game.bubbles.firstOrNull { abs(y - it.getCentralY(bubbleDiametr.toFloat())) <= bubbleDiametr * 2
-                && abs(x - it.getCentralX(bubbleDiametr.toFloat())) <= bubbleDiametr * 1.5}
+    private fun getTouchedBubble(x: Float,y: Float) : Bubble? =
+        game.bubbles.firstOrNull { abs(y - it.getCentralY(bubbleDiametr.toFloat())) <= bubbleDiametr * /*(if(Game.bubbleDuration < 1000) 2.1 else 2.4*/2.35
+                && abs(x - it.getCentralX(bubbleDiametr.toFloat())) <= bubbleDiametr * /*if(Game.bubbleDuration < 1000) 1.6 else 1.8*/1.8}
 
     init {
         setOnTouchListener{ v,e ->
@@ -209,11 +223,11 @@ class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit,
             if(isPaused) return@setOnTouchListener true
             if(e.action == MotionEvent.ACTION_DOWN)
             {
-                val b = this@GameField.getTouchedBubble2(e.x, e.y)
+                val b = this@GameField.getTouchedBubble(e.x, e.y)
                 b?.line = getNearestLine(e.x)?: b?.line!!
             }
             else/*if(e.action == MotionEvent.ACTION_MOVE) */{
-                val b = this@GameField.getTouchedBubble(e.x, e.y )//if(e.action == MotionEvent.ACTION_MOVE) 2.35f else if(e.action == MotionEvent.ACTION_DOWN) 1.3f else 0f)
+                val b = this@GameField.getTouchingBubble(e.x, e.y )//if(e.action == MotionEvent.ACTION_MOVE) 2.35f else if(e.action == MotionEvent.ACTION_DOWN) 1.3f else 0f)
                 b?.line = getNearestLine(e.x)?: b?.line!!
             }
             return@setOnTouchListener true

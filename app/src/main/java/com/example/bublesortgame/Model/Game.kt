@@ -47,13 +47,14 @@ class Game(var scores: Int = 0,var lives: Int = 5,val bubbles: CopyOnWriteArrayL
 
     private fun getReceiver() : Receiver?
     {
-        val r: Receiver = receivers.minBy { abs(slider.centerX - it.value.centerX) }!!.value
+        val r = receivers.minBy { abs(slider.centerX - it.value.centerX) }!!.value
         return if(abs(slider.centerX - r.centerX) < DELTA) r else null
     }
-    companion object{
+    companion object {
         private var speedUpFrequency = 10
         private const val DELTA = 5
-        var bubbleDuration = 2000L
+        const val bubbleStandardDuration = 2000L
+        var bubbleDuration = bubbleStandardDuration
         var sliderDuration = 1500L
         var ReceiverWidth = 0
         var SliderWidth = 0
