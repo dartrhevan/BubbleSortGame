@@ -11,17 +11,19 @@ class Game(var scores: Int = 0,var lives: Int = 5,val bubbles: CopyOnWriteArrayL
            val receivers : Map<Int, Receiver> =  mapOf(0 to Receiver(0, Colour.BLUE), 1 to Receiver(1, Colour.RED), 2 to
                    Receiver(2, Colour.GREEN), 3 to Receiver(3, Colour.YELLOW))) {
     val slider: Slider = Slider(this)
-     fun acceptBubble(bubble: Bubble) : Boolean {
-        if(!bubbles.contains(bubble)) return false
+     fun acceptBubble(bubble: Bubble) : Result {
+         var received = false
+        if(!bubbles.contains(bubble)) return Result(false, false)
         if(receivers[bubble.line]?.colour == bubble.colour) {
             scores++
             bubble.extraAction()
+            received = true
         }
         else lives--
         bubbles.remove(bubble)
          if(!slider.megaBoost && (scores + 1) % speedUpFrequency == 0)
              speedUp()
-        return lives == 0
+        return Result(lives == 0, received)
     }
 
     fun restart() {
