@@ -153,18 +153,14 @@ class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit,
         animators.clear()
         canvas?.drawRect(game.slider.X ,height.toFloat() - sliderBitmap.height, game.slider.X + sliderBitmap.width,height.toFloat() - sliderBitmap.height + 25f, radiancePaint)//
         canvas?.drawBitmap(sliderBitmap, game.slider.X ,height.toFloat() - sliderBitmap.height, null)
-        //synchronized(game.bubbles) {
         for(b in game.bubbles) {
             canvas!!.drawCircle(b.X + bubbleDiametr / 2, b.Y,bubbleDiametr / 2f, if(b is StandartBubble) paints[b.colour]!! else radiancePaints[b.colour]!!)
             canvas.drawText(b.label,b.X + bubbleDiametr / 2,b.Y + bubbleDiametr * 0.125f,textPaint)
-            }
-        //}
-        Log.println(Log.DEBUG,"",game.receivers.contentToString())
+        }
+        //Log.println(Log.DEBUG,"",game.receivers.contentToString())
         for(r in game.receivers) {
             canvas!!.drawRect(r!!.X + 2, 0f,r!!.X + receiverBitmap.width, receiverBitmap.height.toFloat() ,
-                if(animatedReceivers.contains(r.number))
-                    radiancePaints[r!!.colour]!!
-                else paints[r!!.colour]!!)
+                if(animatedReceivers.contains(r.number)) radiancePaints[r!!.colour]!! else paints[r!!.colour]!!)
             canvas.drawBitmap(receiverBitmap,r!!.X,0f,null)
         }
     }
@@ -230,7 +226,7 @@ class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit,
                 }
                 this@GameField.invalidate()
             }
-        }, 0, 15)
+        }, 0, 17)
         sliderAnimator!!.start()
         sliderAnimator!!.pause()
         }
