@@ -19,11 +19,12 @@ data class Slider(val game: Game, var X: Float = 0f) {
 
     private fun generateBubble(Y: Float,rec: Receiver) : Bubble
     {
+
         return when(r.nextInt(100)) {
-            in 0..15 -> SmallBonusBubble(game/*, rec.X */,Y,Colour.values()[r.nextUInt(4u).toInt()],rec.number)
-            in 15..20 -> BigBonusBubble(game/*, rec.X */,Y,Colour.values()[r.nextUInt(4u).toInt()],rec.number)
-            in 20..25 -> ExtraLifeBubble(game/*, rec.X */,Y,Colour.values()[r.nextUInt(4u).toInt()],rec.number)
-            else -> StandartBubble(game/*, rec.X */,Y,Colour.values()[r.nextUInt(4u).toInt()],rec.number)
+            in 0..15 -> SmallBonusBubble(game, Y, game.colours[r.nextUInt(4u).toInt()], rec.number)
+            in 15..20 -> BigBonusBubble(game, Y, game.colours[r.nextUInt(4u).toInt()], rec.number)
+            in 20..25 -> ExtraLifeBubble(game, Y, game.colours[r.nextUInt(4u).toInt()], rec.number)
+            else -> StandartBubble(game, Y, game.colours[r.nextUInt(4u).toInt()], rec.number)
         }
     }
 

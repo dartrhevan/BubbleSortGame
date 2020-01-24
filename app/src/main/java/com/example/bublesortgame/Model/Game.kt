@@ -1,15 +1,31 @@
 package com.example.bublesortgame.Model
 
-import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
-import kotlin.collections.ArrayList
+import kotlin.collections.HashSet
 import kotlin.math.abs
 import kotlin.math.round
 import kotlin.random.Random
 
-class Game(var scores: Int = 0,var lives: Int = 5,val bubbles: CopyOnWriteArrayList<Bubble> = CopyOnWriteArrayList()/*MutableList<Bubble> = Collections.synchronizedList(ArrayList<Bubble>())*/,
-           val receivers : Map<Int, Receiver> =  mapOf(0 to Receiver(0, Colour.BLUE), 1 to Receiver(1, Colour.RED), 2 to
-                   Receiver(2, Colour.GREEN), 3 to Receiver(3, Colour.YELLOW))) {
+class Game(var scores: Int = 0,var lives: Int = 5,val bubbles: CopyOnWriteArrayList<Bubble> = CopyOnWriteArrayList()) {
+    val receivers =  Array<Receiver?>(4) {null}
+
+    init {
+        initReceivers()
+    }
+
+    private fun initReceivers() {
+        val colours = Colour.values()
+        val colourNums = HashSet<Int>()
+        for(i in 0..3)
+        {
+            var colorNum = Random.nextInt(colours.size)
+            while (colourNums.contains(colorNum))
+                colorNum = Random.nextInt(Colour.values().size)
+            receivers[i] = Receiver(i, colours[colorNum])
+            colourNums.add(colorNum)
+        }
+    }
+
     val slider: Slider = Slider(this)
      fun acceptBubble(bubble: Bubble) : Result {
          var received = false
@@ -25,7 +41,9 @@ class Game(var scores: Int = 0,var lives: Int = 5,val bubbles: CopyOnWriteArrayL
              speedUp()
         return Result(lives == 0, received)
     }
-
+    private var _colours = receivers.map { it!!.colour }
+    val colours
+    get() = _colours
     fun restart() {
         bubbleDuration = 2000L
         sliderDuration = 1500L
@@ -34,6 +52,9 @@ class Game(var scores: Int = 0,var lives: Int = 5,val bubbles: CopyOnWriteArrayL
         scores = 0
         slider.megaBoost = false
         lives = 5
+
+        initReceivers()
+        _colours = receivers.map { it!!.colour }
     }
 
     fun act(bottom: Float) : Bubble? {
@@ -49,7 +70,7 @@ class Game(var scores: Int = 0,var lives: Int = 5,val bubbles: CopyOnWriteArrayL
 
     private fun getReceiver() : Receiver?
     {
-        val r = receivers.minBy { abs(slider.centerX - it.value.centerX) }!!.value
+        val r = receivers.minBy { abs(slider.centerX - it!!.centerX) }!!
         return if(abs(slider.centerX - r.centerX) < DELTA) r else null
     }
     companion object {

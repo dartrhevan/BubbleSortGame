@@ -4,20 +4,15 @@ import android.animation.Animator
 import android.animation.Animator.AnimatorListener
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
-import android.graphics.drawable.ColorDrawable
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.scale
-import com.example.bublesortgame.Model.Bubble
-import com.example.bublesortgame.Model.Colour
-import com.example.bublesortgame.Model.Game
-import com.example.bublesortgame.Model.Slider
+import com.example.bublesortgame.Model.*
 import java.util.*
 import kotlin.collections.HashSet
 import kotlin.math.abs
@@ -27,49 +22,28 @@ import kotlin.math.sqrt
 class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit, private val game: Game = Game()) : View(context) {
 
     private val paints = mutableMapOf<Colour, Paint>()
-    init {/*
-        val y = Paint()
-        y.style = Paint.Style.FILL
-        y.color = Color.YELLOW
-        paints[Colour.YELLOW] = y
-
-        val g = Paint()
-        g.style = Paint.Style.FILL
-        g.color = Color.GREEN
-        paints[Colour.GREEN] = g
-
-        val b = Paint()
-        b.style = Paint.Style.FILL
-        b.color = Color.BLUE
-        paints[Colour.BLUE] = b
-
-        val r = Paint()
-        r.style = Paint.Style.FILL
-        r.color = Color.RED
-        paints[Colour.RED] = r
-        Colour.values().map {
-            val p = Paint()
-            p.style = Paint.Style.FILL
-            p.color = it.color
-            it to Pair(it, p)
-        }*/
-        paints.putAll(Colour.values().map {
+    private val radiancePaints = mutableMapOf<Colour, Paint>()
+    init {
+        initPaints()
+    }
+    private fun initPaints() {
+        paints.clear()
+        paints.putAll(game.colours.map {
             val p = Paint()
             p.style = Paint.Style.FILL
             p.color = it.color
             it to  p
         })
+        radiancePaints.clear()
+        radiancePaints.putAll(paints.map {
+            val p = Paint()
+            p.style = it.value.style
+            p.color = it.value.color
+            p.setShadowLayer(15f, 0f, 0f, it.value.color)
+            it.key to p
+        }.toMap())
     }
-    private val shadowedPaints = paints.map {
-        val p = Paint()
-        p.style = it.value.style
-        p.color = it.value.color
-        p.setShadowLayer(15f, 0f, 0f, it.value.color)
-        it.key to p
-    }.toMap()
-
     init {
-        //shadowedPaints.forEach { it.value.setShadowLayer(15f, 0f, 0f, it.value.color)}
         this.setLayerType(LAYER_TYPE_SOFTWARE, null)
     }
 
@@ -159,6 +133,8 @@ class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit,
         bubbleAnims.clear()
         game.restart()
         (context as AppCompatActivity).supportActionBar!!.title = "S ${game.scores} L ${game.lives}"
+        initReceivers()
+        initPaints()
     }
     private var receiverBitmap = resources.getDrawable(R.drawable.receiver,null).toBitmap()
     private var sliderBitmap = resources.getDrawable(R.drawable.slider,null).toBitmap()
@@ -169,16 +145,7 @@ class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit,
         textPaint.color = Color.GRAY
         textPaint.textAlign = Paint.Align.CENTER
     }
-/*
-    private val receiversBitmap = mapOf(Colour.GREEN to resources.getDrawable(R.drawable.receiver_green,null).toBitmap(),
-        Colour.BLUE to resources.getDrawable(R.drawable.receiver_blue,null).toBitmap(),
-        Colour.RED to resources.getDrawable(R.drawable.receiver_red,null).toBitmap(),
-        Colour.YELLOW to resources.getDrawable(R.drawable.receiver_yel,null).toBitmap())
-    init{
-        Game.ReceiverWidth = receiversBitmap[Colour.YELLOW]!!.width
-    }*/
 
-    //@Synchronized
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
         for(a in animators)
@@ -188,18 +155,17 @@ class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit,
         canvas?.drawBitmap(sliderBitmap, game.slider.X ,height.toFloat() - sliderBitmap.height, null)
         //synchronized(game.bubbles) {
         for(b in game.bubbles) {
-            canvas!!.drawCircle(b.X + bubbleDiametr / 2, b.Y,bubbleDiametr / 2f,paints[b.colour]!!)
+            canvas!!.drawCircle(b.X + bubbleDiametr / 2, b.Y,bubbleDiametr / 2f, if(b is StandartBubble) paints[b.colour]!! else radiancePaints[b.colour]!!)
             canvas.drawText(b.label,b.X + bubbleDiametr / 2,b.Y + bubbleDiametr * 0.125f,textPaint)
             }
         //}
+        Log.println(Log.DEBUG,"",game.receivers.contentToString())
         for(r in game.receivers) {
-            /*val p = Paint()
-            p.setShadowLayer(30f, 5f, 5f, Color.RED)
-            p.color = Color.WHITE
-            p.style = Paint.Style.FILL*/
-            canvas!!.drawRect(r.value.X + 2, 0f,r.value.X + receiverBitmap.width, receiverBitmap.height.toFloat() ,
-                if(animatedReceivers.contains(r.key)) shadowedPaints[r.value.colour]!! else paints[r.value.colour]!!)
-            canvas.drawBitmap(receiverBitmap,r.value.X,0f,null)
+            canvas!!.drawRect(r!!.X + 2, 0f,r!!.X + receiverBitmap.width, receiverBitmap.height.toFloat() ,
+                if(animatedReceivers.contains(r.number))
+                    radiancePaints[r!!.colour]!!
+                else paints[r!!.colour]!!)
+            canvas.drawBitmap(receiverBitmap,r!!.X,0f,null)
         }
     }
 
@@ -211,15 +177,19 @@ class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit,
         Game.SliderWidth = sliderBitmap.width
         Game.ReceiverWidth = Game.SliderWidth
         receiverBitmap = receiverBitmap.scale(Game.SliderWidth, Game.SliderWidth)
-            for(r in game.receivers)
-                r.value.X = r.key * bubbleDiametr * 2f + (bubbleDiametr * 2f - Game.ReceiverWidth) / 2f
+        initReceivers()
+    }
+
+    private fun initReceivers() {
+        for(r in game.receivers)
+            r!!.X = r!!.number * bubbleDiametr * 2f + (bubbleDiametr * 2f - Game.ReceiverWidth) / 2f
     }
 
     companion object {
         private fun getDistance(x1: Float, y1:Float, x2: Float, y2: Float): Float = sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
     }
 
-    private fun getNearestLine(x: Float) : Int? = game.receivers.values.minBy { abs(x - it.centerX) }?.number
+    private fun getNearestLine(x: Float) : Int? = game.receivers.minBy { abs(x - it!!.centerX) }?.number
 
     private fun getTouchingBubble(x: Float,y: Float,radius: Float = 2.45f) : Bubble? = game.bubbles.firstOrNull { getDistance(x, y, it.getCentralX(bubbleDiametr.toFloat()),
         it.getCentralY(bubbleDiametr.toFloat())) <= bubbleDiametr *  radius}
@@ -231,7 +201,6 @@ class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit,
 
     init {
         setOnTouchListener{ v,e ->
-            //(context as MainActivity).supportActionBar!!.title = e.action.toString().
             if(isPaused) return@setOnTouchListener true
             if(e.action == MotionEvent.ACTION_DOWN)
             {
