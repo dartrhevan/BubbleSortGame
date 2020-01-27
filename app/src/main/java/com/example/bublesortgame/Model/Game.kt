@@ -90,16 +90,14 @@ class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubb
     companion object {
 
         private fun generateFragments(bubble: Bubble, bubbleDiam: Int) : ArrayList<Fragment> {
-            /*arrayOf(Fragment(bubble.getCentralX(bubbleDiam.toFloat()), bubble.getCentralY(bubbleDiam.toFloat()),
-                bubble.X + 150, bubble.Y + 250, 250, bubble.colour, bubbleDiam.toFloat() / 6))*/
             val res = ArrayList<Fragment>()
             val size = 5 + Random.nextInt(12)
             val spread = bubbleDiam / 4
             for(i in 0 until size)
                 res.add(Fragment(bubble.getCentralX(bubbleDiam.toFloat()) + Random.nextInt(-spread, spread),
                     bubble.getCentralY(bubbleDiam.toFloat())+ Random.nextInt(-spread, spread),
-                    bubble.X + 2 * spread + 2 * Random.nextInt(-spread, spread), bubble.Y + 1.5f * bubbleDiam + Random.nextInt(spread),
-                    round(150 * Random.nextFloat()).toLong(), bubble.colour, spread.toFloat() * Random.nextFloat() / 2))
+                    bubble.X + 2 * spread + 3 * Random.nextInt(-spread, spread), bubble.Y + bubbleDiam + 1.5f * Random.nextInt(2 * spread),
+                    round(350 * Random.nextFloat()).toLong(), bubble.colour, spread.toFloat() * Random.nextFloat() / 2))
             return res
         }
 
