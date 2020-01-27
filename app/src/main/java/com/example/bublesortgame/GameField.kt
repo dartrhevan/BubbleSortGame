@@ -12,10 +12,11 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.animation.addListener
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.scale
 import com.example.bublesortgame.Model.*
+import com.example.bublesortgame.Model.bubbles.Bubble
+import com.example.bublesortgame.Model.bubbles.StandartBubble
 import java.util.*
 import kotlin.collections.HashSet
 import kotlin.math.abs
@@ -82,42 +83,19 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
     //@Synchronized
     //@SuppressLint("NewApi")
     private fun addBubbleAnim(b: Bubble) {
-        val an = ObjectAnimator.ofFloat(b,Bubble::Y.name,b.Y, /*-bubbleDiametr.toFloat()*/0f)
+        val an = ObjectAnimator.ofFloat(b,
+            Bubble::Y.name,b.Y, /*-bubbleDiametr.toFloat()*/0f)
         an.duration = Game.bubbleDuration
         an.addListener(object : AnimatorListener {
             override fun onAnimationRepeat(p0: Animator?) {}
             @RequiresApi(Build.VERSION_CODES.N)
             override fun onAnimationEnd(p0: Animator?) {
-                val res = game.acceptBubble(b)
+                val res = game.acceptBubble(b, bubbleDiametr)
                 if(res.endGame)
                     gameOver()
                 (context as AppCompatActivity).supportActionBar!!.title = "S ${game.scores} L ${game.lives}"
-
-                if(res.received) {
-                    animatedReceivers.add(b.line)
-                    timer.schedule(object : TimerTask() {
-                        override fun run() {
-                            animatedReceivers.remove(b.line)
-                        }
-                    },250)
-                }
-
-                for(fr in res.fragments) {
-                    val ax = ObjectAnimator.ofFloat(fr, Fragment::Y.name, fr.tY)
-                    val ay = ObjectAnimator.ofFloat(fr, Fragment::X.name, fr.tX)
-                    animators.add(ax)
-                    animators.add(ay)
-                    ay.addListener(object: AnimatorListener {
-                        override fun onAnimationRepeat(p0: Animator?) {}
-                        override fun onAnimationEnd(p0: Animator?) {
-                            Log.println(Log.DEBUG, "", "CONTAINS: ${game.fragments.contains(fr)}")
-                            game.fragments.remove(fr)
-                        }
-                        override fun onAnimationCancel(p0: Animator?) {}
-                        override fun onAnimationStart(p0: Animator?) {}
-                    } )
-                }
-
+                this@GameField.animateReceivers(b, res)
+                this@GameField.animateFragments(res)
             }
             override fun onAnimationCancel(p0: Animator?) {}
             override fun onAnimationStart(p0: Animator?) {}
@@ -133,6 +111,35 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
                 /*animatedReceivers.remove(b.line)*/
             }
         }, 300)
+    }
+
+    fun animateReceivers(b: Bubble, res: Result) {
+        if(res.received) {
+            animatedReceivers.add(b.line)
+            timer.schedule(object : TimerTask() {
+                override fun run() {
+                    animatedReceivers.remove(b.line)
+                }
+            },250)
+        }
+    }
+
+    fun animateFragments(res: Result) {
+        for(fr in res.fragments) {
+            val ax = ObjectAnimator.ofFloat(fr, Fragment::Y.name, fr.tY)
+            val ay = ObjectAnimator.ofFloat(fr, Fragment::X.name, fr.tX)
+            animators.add(ax)
+            animators.add(ay)
+            ay.addListener(object: AnimatorListener {
+                override fun onAnimationRepeat(p0: Animator?) {}
+                override fun onAnimationEnd(p0: Animator?) {
+                    Log.println(Log.DEBUG, "", "CONTAINS: ${game.fragments.contains(fr)}")
+                    game.fragments.remove(fr)
+                }
+                override fun onAnimationCancel(p0: Animator?) {}
+                override fun onAnimationStart(p0: Animator?) {}
+            } )
+        }
     }
 
     private val sliderTimer = Timer()
@@ -174,7 +181,7 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
         animators.clear()
 
         for(fr in game.fragments)
-            canvas!!.drawCircle(fr.X, fr.Y,bubbleDiametr / 4f, paints[fr.colour]!!)
+            canvas!!.drawCircle(fr.X/* + fr.diam / 2*/, fr.Y,fr.diam, paints[fr.colour]!!)
         canvas?.drawRect(game.slider.X ,height.toFloat() - sliderBitmap.height, game.slider.X + sliderBitmap.width,height.toFloat() - sliderBitmap.height + 25f, radiancePaint)//
         canvas?.drawBitmap(sliderBitmap, game.slider.X ,height.toFloat() - sliderBitmap.height, null)
         for(b in game.bubbles) {

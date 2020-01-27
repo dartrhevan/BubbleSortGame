@@ -1,6 +1,5 @@
 package com.example.bublesortgame
 
-import com.example.bublesortgame.Model.Bubble
 import org.junit.Test
 
 import org.junit.Assert.*

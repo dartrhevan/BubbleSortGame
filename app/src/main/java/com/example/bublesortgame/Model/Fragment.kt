@@ -1,7 +1,9 @@
 package com.example.bublesortgame.Model
 
+import kotlin.random.Random
 
-class Fragment(val id: Int, var X: Float, var Y: Float, val tX: Float, val tY: Float, val duration: Int, val colour: Colour)
+
+class Fragment(var X: Float, var Y: Float, val tX: Float, val tY: Float, val duration: Int, val colour: Colour, val diam: Float, val id: Int = Random.nextInt())
 {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

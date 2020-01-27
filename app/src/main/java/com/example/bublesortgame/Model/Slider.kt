@@ -1,5 +1,6 @@
 package com.example.bublesortgame.Model
 
+import com.example.bublesortgame.Model.bubbles.*
 import java.util.*
 import kotlin.random.Random
 import kotlin.random.nextUInt
@@ -21,10 +22,30 @@ data class Slider(val game: Game, var X: Float = 0f) {
     {
 
         return when(r.nextInt(100)) {
-            in 0..15 -> SmallBonusBubble(game, Y, game.colours[r.nextUInt(4u).toInt()], rec.number)
-            in 15..20 -> BigBonusBubble(game, Y, game.colours[r.nextUInt(4u).toInt()], rec.number)
-            in 20..25 -> ExtraLifeBubble(game, Y, game.colours[r.nextUInt(4u).toInt()], rec.number)
-            else -> StandartBubble(game, Y, game.colours[r.nextUInt(4u).toInt()], rec.number)
+            in 0..15 -> SmallBonusBubble(
+                game,
+                Y,
+                game.colours[r.nextUInt(4u).toInt()],
+                rec.number
+            )
+            in 15..20 -> BigBonusBubble(
+                game,
+                Y,
+                game.colours[r.nextUInt(4u).toInt()],
+                rec.number
+            )
+            in 20..25 -> ExtraLifeBubble(
+                game,
+                Y,
+                game.colours[r.nextUInt(4u).toInt()],
+                rec.number
+            )
+            else -> StandartBubble(
+                game,
+                Y,
+                game.colours[r.nextUInt(4u).toInt()],
+                rec.number
+            )
         }
     }
 

@@ -3,8 +3,8 @@ package com.example.bublesortgame.Model
 import android.annotation.TargetApi
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.example.bublesortgame.Model.bubbles.Bubble
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.collections.HashSet
 import kotlin.math.abs
 import kotlin.math.round
@@ -12,8 +12,8 @@ import kotlin.random.Random
 
 @TargetApi(Build.VERSION_CODES.N)
 @RequiresApi(Build.VERSION_CODES.N)
-class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: CopyOnWriteArrayList<Bubble> = CopyOnWriteArrayList(),//: MutableSet<Bubble> = ConcurrentHashMap.newKeySet(),
-    val fragments: MutableSet<Fragment> = ConcurrentHashMap.newKeySet())//: CopyOnWriteArrayList<Bubble> = CopyOnWriteArrayList())//ConcurrentLinkedDeque
+class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubble> =  ConcurrentHashMap.newKeySet(),//: MutableSet<Bubble> = ConcurrentHashMap.newKeySet(),
+           val fragments: MutableSet<Fragment> = ConcurrentHashMap.newKeySet())//: CopyOnWriteArrayList<Bubble> = CopyOnWriteArrayList())//ConcurrentLinkedDeque
 {
 
 
@@ -37,7 +37,8 @@ class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: CopyOnWriteArra
     }
 
     val slider: Slider = Slider(this)
-     fun acceptBubble(bubble: Bubble) : Result {
+
+     fun acceptBubble(bubble: Bubble, bubbleDiam: Int) : Result {
          var received = false
         if(!bubbles.contains(bubble)) return Result(false, false)
         if(receivers[bubble.line]?.colour == bubble.colour) {
@@ -47,7 +48,8 @@ class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: CopyOnWriteArra
         }
         else lives--
 
-        val frs = arrayOf(Fragment(Random.nextInt(), bubble.X, bubble.Y, bubble.X + 20, bubble.Y + 250, 250, bubble.colour))
+        val frs = arrayOf(Fragment(bubble.getCentralX(bubbleDiam.toFloat()), bubble.getCentralY(bubbleDiam.toFloat()),
+            bubble.X + 150, bubble.Y + 250, 250, bubble.colour, bubbleDiam.toFloat() / 6))
 
         fragments.addAll(frs)
 
