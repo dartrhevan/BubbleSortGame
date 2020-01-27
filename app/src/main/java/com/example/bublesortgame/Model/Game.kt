@@ -16,7 +16,6 @@ class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubb
            val fragments: MutableSet<Fragment> = ConcurrentHashMap.newKeySet())//: CopyOnWriteArrayList<Bubble> = CopyOnWriteArrayList())//ConcurrentLinkedDeque
 {
 
-
     val receivers =  Array<Receiver?>(4) {null}
 
     init {
@@ -47,12 +46,8 @@ class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubb
             received = true
         }
         else lives--
-
-        val frs = arrayOf(Fragment(bubble.getCentralX(bubbleDiam.toFloat()), bubble.getCentralY(bubbleDiam.toFloat()),
-            bubble.X + 150, bubble.Y + 250, 250, bubble.colour, bubbleDiam.toFloat() / 6))
-
+        val frs = generateFragments(bubble, bubbleDiam)
         fragments.addAll(frs)
-
         bubbles.remove(bubble)
          if(!slider.megaBoost && (scores + 1) % speedUpFrequency == 0)
              speedUp()
@@ -61,6 +56,7 @@ class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubb
     private var _colours = receivers.map { it!!.colour }
     val colours
     get() = _colours
+
     fun restart() {
         bubbleDuration = 2000L
         sliderDuration = 1500L
@@ -69,10 +65,8 @@ class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubb
         scores = 0
         slider.megaBoost = false
         lives = 5
-
         initReceivers()
         _colours = receivers.map { it!!.colour }
-
         fragments.clear()
     }
 
@@ -92,7 +86,23 @@ class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubb
         val r = receivers.minBy { abs(slider.centerX - it!!.centerX) }!!
         return if(abs(slider.centerX - r.centerX) < DELTA) r else null
     }
+
     companion object {
+
+        private fun generateFragments(bubble: Bubble, bubbleDiam: Int) : ArrayList<Fragment> {
+            /*arrayOf(Fragment(bubble.getCentralX(bubbleDiam.toFloat()), bubble.getCentralY(bubbleDiam.toFloat()),
+                bubble.X + 150, bubble.Y + 250, 250, bubble.colour, bubbleDiam.toFloat() / 6))*/
+            val res = ArrayList<Fragment>()
+            val size = 5 + Random.nextInt(12)
+            val spread = bubbleDiam / 4
+            for(i in 0 until size)
+                res.add(Fragment(bubble.getCentralX(bubbleDiam.toFloat()) + Random.nextInt(-spread, spread),
+                    bubble.getCentralY(bubbleDiam.toFloat())+ Random.nextInt(-spread, spread),
+                    bubble.X + 2 * spread + 2 * Random.nextInt(-spread, spread), bubble.Y + 1.5f * bubbleDiam + Random.nextInt(spread),
+                    round(150 * Random.nextFloat()).toLong(), bubble.colour, spread.toFloat() * Random.nextFloat() / 2))
+            return res
+        }
+
         private var speedUpFrequency = 10
         private const val DELTA = 5
         const val bubbleStandardDuration = 2000L

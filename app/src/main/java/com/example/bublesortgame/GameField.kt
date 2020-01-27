@@ -80,11 +80,9 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
     init {
         radiancePaint.color = Color.LTGRAY
     }
-    //@Synchronized
-    //@SuppressLint("NewApi")
+
     private fun addBubbleAnim(b: Bubble) {
-        val an = ObjectAnimator.ofFloat(b,
-            Bubble::Y.name,b.Y, /*-bubbleDiametr.toFloat()*/0f)
+        val an = ObjectAnimator.ofFloat(b, Bubble::Y.name,b.Y, 0f)
         an.duration = Game.bubbleDuration
         an.addListener(object : AnimatorListener {
             override fun onAnimationRepeat(p0: Animator?) {}
@@ -102,15 +100,9 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
         })
         bubbleAnims.add(an)
         animators.add(an)
-
         radiancePaint.setShadowLayer(25f, 0f, 0f, b.colour.color)
         sliderTimer.purge()
-        sliderTimer.schedule(object : TimerTask() {
-            override fun run() {
-                radiancePaint.clearShadowLayer()
-                /*animatedReceivers.remove(b.line)*/
-            }
-        }, 300)
+        sliderTimer.schedule(object : TimerTask() {override fun run() = radiancePaint.clearShadowLayer()}, 300)
     }
 
     fun animateReceivers(b: Bubble, res: Result) {
@@ -128,6 +120,8 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
         for(fr in res.fragments) {
             val ax = ObjectAnimator.ofFloat(fr, Fragment::Y.name, fr.tY)
             val ay = ObjectAnimator.ofFloat(fr, Fragment::X.name, fr.tX)
+            ax.duration = fr.duration
+            ay.duration = fr.duration
             animators.add(ax)
             animators.add(ay)
             ay.addListener(object: AnimatorListener {
@@ -176,9 +170,6 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-        for(a in animators)
-            a.start()
-        animators.clear()
 
         for(fr in game.fragments)
             canvas!!.drawCircle(fr.X/* + fr.diam / 2*/, fr.Y,fr.diam, paints[fr.colour]!!)
@@ -188,13 +179,15 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
             canvas!!.drawCircle(b.X + bubbleDiametr / 2, b.Y,bubbleDiametr / 2f, if(b is StandartBubble) paints[b.colour]!! else radiancePaints[b.colour]!!)
             canvas.drawText(b.label,b.X + bubbleDiametr / 2,b.Y + bubbleDiametr * 0.125f,textPaint)
         }
-        //Log.println(Log.DEBUG,"",game.receivers.contentToString())
         for(r in game.receivers) {
             canvas!!.drawRect(r!!.X + 2, 0f,r!!.X + receiverBitmap.width, receiverBitmap.height.toFloat() ,
                 if(animatedReceivers.contains(r.number)) radiancePaints[r!!.colour]!! else paints[r!!.colour]!!)
             canvas.drawBitmap(receiverBitmap,r!!.X,0f,null)
         }
 
+        for(a in animators)
+            a.start()
+        animators.clear()
     }
 
     override fun onSizeChanged(w: Int,h: Int,oldw: Int,oldh: Int) {
