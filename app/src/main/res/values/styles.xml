@@ -7,13 +7,22 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <!--<item name="android:background">#AAAAAA</item>-->
-    </style><!--
-    <style name="ActionBarStyle" parent="@android:style/Widget.Holo.Light.ActionBar">
-        <item name="android:titleTextStyle">@style/ActionBar.TitleTextStyle</item>
     </style>
 
-    <style name="ActionBar.TitleTextStyle" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
-        <item name="android:textColor">#FF0000</item>
-        <item name="android:actionMenuTextColor">#FF0000</item>
-    </style>-->
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="buttonStyle">
+        <item name="android:textSize">10pt</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <!--<item name="android:shadowColor">#111111</item>
+        <item name="android:shadowRadius">5</item>-->
+    </style>
 </resources>

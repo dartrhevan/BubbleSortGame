@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">BubleSortGame</string>
+    <string name="title_activity_start">StartActivity</string>
 </resources>

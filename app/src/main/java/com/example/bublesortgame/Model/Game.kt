@@ -88,7 +88,6 @@ class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubb
     }
 
     companion object {
-
         private fun generateFragments(bubble: Bubble, bubbleDiam: Int) : ArrayList<Fragment> {
             val res = ArrayList<Fragment>()
             val size = 5 + Random.nextInt(12)
