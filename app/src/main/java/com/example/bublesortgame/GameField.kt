@@ -6,10 +6,13 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.*
+import android.os.Build
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.animation.addListener
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.scale
 import com.example.bublesortgame.Model.*
@@ -18,8 +21,8 @@ import kotlin.collections.HashSet
 import kotlin.math.abs
 import kotlin.math.sqrt
 
-
-class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit, private val game: Game = Game()) : View(context) {
+@RequiresApi(Build.VERSION_CODES.N)
+class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, private val game: Game = Game()) : View(context) {
 
     private val paints = mutableMapOf<Colour, Paint>()
     private val radiancePaints = mutableMapOf<Colour, Paint>()
@@ -83,21 +86,38 @@ class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit,
         an.duration = Game.bubbleDuration
         an.addListener(object : AnimatorListener {
             override fun onAnimationRepeat(p0: Animator?) {}
+            @RequiresApi(Build.VERSION_CODES.N)
             override fun onAnimationEnd(p0: Animator?) {
                 val res = game.acceptBubble(b)
                 if(res.endGame)
                     gameOver()
                 (context as AppCompatActivity).supportActionBar!!.title = "S ${game.scores} L ${game.lives}"
+
                 if(res.received) {
                     animatedReceivers.add(b.line)
                     timer.schedule(object : TimerTask() {
                         override fun run() {
                             animatedReceivers.remove(b.line)
                         }
-
                     },250)
                 }
-                //context.actionBar!!.title = "Scores: 0 Lives: 5"
+
+                for(fr in res.fragments) {
+                    val ax = ObjectAnimator.ofFloat(fr, Fragment::Y.name, fr.tY)
+                    val ay = ObjectAnimator.ofFloat(fr, Fragment::X.name, fr.tX)
+                    animators.add(ax)
+                    animators.add(ay)
+                    ay.addListener(object: AnimatorListener {
+                        override fun onAnimationRepeat(p0: Animator?) {}
+                        override fun onAnimationEnd(p0: Animator?) {
+                            Log.println(Log.DEBUG, "", "CONTAINS: ${game.fragments.contains(fr)}")
+                            game.fragments.remove(fr)
+                        }
+                        override fun onAnimationCancel(p0: Animator?) {}
+                        override fun onAnimationStart(p0: Animator?) {}
+                    } )
+                }
+
             }
             override fun onAnimationCancel(p0: Animator?) {}
             override fun onAnimationStart(p0: Animator?) {}
@@ -126,6 +146,7 @@ class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit,
     val scores: Int
     get() = game.scores
 
+    //@RequiresApi(Build.VERSION_CODES.N)
     fun restartGame() {
         isPaused = false
         animators.clear()
@@ -151,6 +172,9 @@ class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit,
         for(a in animators)
             a.start()
         animators.clear()
+
+        for(fr in game.fragments)
+            canvas!!.drawCircle(fr.X, fr.Y,bubbleDiametr / 4f, paints[fr.colour]!!)
         canvas?.drawRect(game.slider.X ,height.toFloat() - sliderBitmap.height, game.slider.X + sliderBitmap.width,height.toFloat() - sliderBitmap.height + 25f, radiancePaint)//
         canvas?.drawBitmap(sliderBitmap, game.slider.X ,height.toFloat() - sliderBitmap.height, null)
         for(b in game.bubbles) {
@@ -163,6 +187,7 @@ class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit,
                 if(animatedReceivers.contains(r.number)) radiancePaints[r!!.colour]!! else paints[r!!.colour]!!)
             canvas.drawBitmap(receiverBitmap,r!!.X,0f,null)
         }
+
     }
 
     override fun onSizeChanged(w: Int,h: Int,oldw: Int,oldh: Int) {
@@ -218,6 +243,7 @@ class GameField(context: Context?, private val onGameOver: ( s:Boolean) -> Unit,
         sliderAnimator!!.repeatMode = ValueAnimator.REVERSE
         sliderAnimator!!.repeatCount = ValueAnimator.INFINITE
         timer.schedule(object : TimerTask() {
+            //@RequiresApi(Build.VERSION_CODES.N)
             override fun run() {
                 if(!_isPaused) {
                     val bub = game.act(height - sliderBitmap.height.toFloat())

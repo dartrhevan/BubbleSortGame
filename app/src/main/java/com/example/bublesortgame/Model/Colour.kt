@@ -8,10 +8,10 @@ enum class Colour(val color: Int) {
     BLUE(Color.BLUE),
     YELLOW(Color.YELLOW),
     BROWN(Color.rgb(139,69,19)),
-    ORANGE(Color.rgb(255,165,0)),
+    ORANGE(Color.rgb(255,79,0)),
     CYAN(Color.CYAN),
     PURPLE(Color.rgb(148,0,211)),
-    CORAL(Color.rgb(255,127,80)),
+    //CORAL(Color.rgb(255,127,80)),
     //MAROON(Color.rgb(155,45,48)),
     LIME(Color.rgb(204,255,0))
 

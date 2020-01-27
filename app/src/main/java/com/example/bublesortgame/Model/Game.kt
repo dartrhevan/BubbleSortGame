@@ -1,12 +1,22 @@
 package com.example.bublesortgame.Model
 
+import android.annotation.TargetApi
+import android.os.Build
+import androidx.annotation.RequiresApi
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.collections.HashSet
 import kotlin.math.abs
 import kotlin.math.round
 import kotlin.random.Random
 
-class Game(var scores: Int = 0,var lives: Int = 5,val bubbles: CopyOnWriteArrayList<Bubble> = CopyOnWriteArrayList()) {
+@TargetApi(Build.VERSION_CODES.N)
+@RequiresApi(Build.VERSION_CODES.N)
+class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: CopyOnWriteArrayList<Bubble> = CopyOnWriteArrayList(),//: MutableSet<Bubble> = ConcurrentHashMap.newKeySet(),
+    val fragments: MutableSet<Fragment> = ConcurrentHashMap.newKeySet())//: CopyOnWriteArrayList<Bubble> = CopyOnWriteArrayList())//ConcurrentLinkedDeque
+{
+
+
     val receivers =  Array<Receiver?>(4) {null}
 
     init {
@@ -36,10 +46,15 @@ class Game(var scores: Int = 0,var lives: Int = 5,val bubbles: CopyOnWriteArrayL
             received = true
         }
         else lives--
+
+        val frs = arrayOf(Fragment(Random.nextInt(), bubble.X, bubble.Y, bubble.X + 20, bubble.Y + 250, 250, bubble.colour))
+
+        fragments.addAll(frs)
+
         bubbles.remove(bubble)
          if(!slider.megaBoost && (scores + 1) % speedUpFrequency == 0)
              speedUp()
-        return Result(lives == 0, received)
+        return Result(lives == 0, received, frs)
     }
     private var _colours = receivers.map { it!!.colour }
     val colours
@@ -55,6 +70,8 @@ class Game(var scores: Int = 0,var lives: Int = 5,val bubbles: CopyOnWriteArrayL
 
         initReceivers()
         _colours = receivers.map { it!!.colour }
+
+        fragments.clear()
     }
 
     fun act(bottom: Float) : Bubble? {

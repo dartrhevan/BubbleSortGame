@@ -1,3 +1,3 @@
 package com.example.bublesortgame.Model
 
-data class Result(val endGame: Boolean, val received:Boolean)
+class Result(val endGame: Boolean, val received: Boolean , val fragments: Array<Fragment> = arrayOf())
