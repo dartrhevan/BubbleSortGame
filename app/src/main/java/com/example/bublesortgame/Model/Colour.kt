@@ -11,8 +11,8 @@ enum class Colour(val color: Int) {
     ORANGE(Color.rgb(255,79,0)),
     CYAN(Color.CYAN),
     PURPLE(Color.rgb(148,0,211)),
-    LIME(Color.rgb(204,255,0)),
-    PINK(Color.rgb(255,41,77)),
+    LIME(Color.rgb(204,255,30)),
+    PINK(Color.rgb(255,82,108)),
     DARKGREEN(Color.rgb(0,60,0))
 
 }

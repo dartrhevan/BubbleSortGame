@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#D81B60"
+    android:background="@color/colorAccent"
     tools:context=".StartActivity">
 
     <Button
@@ -20,6 +20,8 @@
     <Button
         android:id="@+id/records"
         style="@style/buttonStyle"
+        android:layout_width="130dp"
+        android:layout_height="55dp"
         android:onClick="openRecords"
         android:text="records"
         app:layout_constraintBottom_toBottomOf="parent"

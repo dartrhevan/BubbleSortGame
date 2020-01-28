@@ -6,6 +6,8 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.*
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.util.Log
 import android.view.MotionEvent
@@ -21,6 +23,7 @@ import java.util.*
 import kotlin.collections.HashSet
 import kotlin.math.abs
 import kotlin.math.sqrt
+import kotlin.random.Random
 
 @RequiresApi(Build.VERSION_CODES.N)
 class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, private val game: Game = Game()) : View(context) {
@@ -47,8 +50,19 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
             it.key to p
         }.toMap())
     }
+
+    private val backs = arrayOf(context!!.resources.getColor(R.color.colorAccent),
+        context.resources.getColor(R.color.back2), context.resources.getColor(R.color.back3))
+
     init {
         this.setLayerType(LAYER_TYPE_SOFTWARE, null)
+        setBackground()
+        //background = ColorDrawable(context!!.resources.getColor(R.color.colorAccent))
+    }
+
+    private fun setBackground() {
+        background = ColorDrawable(backs[Random.nextInt(backs.size)])
+
     }
 
     private var sliderAnimator: ObjectAnimator? = null
@@ -157,7 +171,14 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
         (context as AppCompatActivity).supportActionBar!!.title = "S ${game.scores} L ${game.lives}"
         initReceivers()
         initPaints()
+        setBackground()
     }
+
+    fun close() {
+        Game.bubbleDuration = 2000L
+        Game.sliderDuration = 1500L
+    }
+
     private var receiverBitmap = resources.getDrawable(R.drawable.receiver,null).toBitmap()
     private var sliderBitmap = resources.getDrawable(R.drawable.slider,null).toBitmap()
     //private val radianceBitmap = ColorDrawable(Color.BLACK).toBitmap(sliderBitmap.width, 1)
@@ -257,4 +278,5 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
         sliderAnimator!!.pause()
         }
     }
+
 }

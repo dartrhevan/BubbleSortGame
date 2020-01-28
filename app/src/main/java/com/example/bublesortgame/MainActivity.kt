@@ -1,17 +1,13 @@
 package com.example.bublesortgame
 
-import android.app.AlertDialog
-import android.content.DialogInterface
 import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
-import android.text.Html
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.example.bublesortgame.results.ResultsDialog
@@ -32,7 +28,7 @@ class MainActivity : AppCompatActivity() {
                 dialog.show()
             }
         })
-        gameField.background = ColorDrawable(Color.parseColor("#AAAAAA"))
+        //gameField.background = ColorDrawable(Color.parseColor("#AAAAAA"))
         setContentView(gameField)
         pauseDrawable = resources.getDrawable(android.R.drawable.ic_media_pause)
         resumeDrawable = resources.getDrawable(android.R.drawable.ic_media_play)
@@ -72,6 +68,12 @@ class MainActivity : AppCompatActivity() {
     fun results(item: MenuItem) {
         val dialog = ResultsDialog(this, -1)
         dialog.show()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    override fun onBackPressed() { // your code.
+        super.onBackPressed()
+        gameField.close()
     }
 }
 
