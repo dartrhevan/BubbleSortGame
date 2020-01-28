@@ -6,11 +6,13 @@ import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
 import android.text.Html
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.example.bublesortgame.results.ResultsDialog
 
@@ -19,24 +21,16 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var pauseButton: MenuItem
     private lateinit var gameField: GameField
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //setContentView(R.layout.activity_main)
         gameField = GameField(this,{ s ->
-            pauseButton.isVisible = false/*
-            val builder = AlertDialog.Builder(this)
-            builder.setTitle("Result")
-                .setMessage("Your result is: ${gameField.scores}\nRecords:\n")
-                .setCancelable(false)
-                .setPositiveButton("Yes") { dialog: DialogInterface?,which: Int ->
-                }
-                .setNegativeButton("No") { dialog: DialogInterface,id1: Int -> dialog.cancel() }
-            val alert = builder.create()*/
+            pauseButton.isVisible = false
             if(s) {
                 val dialog = ResultsDialog(this, gameField.scores)
                 dialog.show()
             }
-            //alert.show()
         })
         gameField.background = ColorDrawable(Color.parseColor("#AAAAAA"))
         setContentView(gameField)
@@ -67,6 +61,7 @@ class MainActivity : AppCompatActivity() {
          item.icon = if(!gameField.isPaused) pauseDrawable else resumeDrawable
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     fun restart(item: MenuItem) {
         gameField.gameOver(false)
         gameField.restartGame()
