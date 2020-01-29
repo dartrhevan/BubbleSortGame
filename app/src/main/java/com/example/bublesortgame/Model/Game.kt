@@ -68,6 +68,7 @@ class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubb
         initReceivers()
         _colours = receivers.map { it!!.colour }
         fragments.clear()
+        slider.straightDirection = true
     }
 
     fun act(bottom: Float) : Bubble? {
@@ -85,6 +86,33 @@ class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubb
     {
         val r = receivers.minBy { abs(slider.centerX - it!!.centerX) }!!
         return if(abs(slider.centerX - r.centerX) < DELTA) r else null
+    }
+
+    fun makeTrace(sliderY: Float, bubbleDiam: Int) : ArrayList<Fragment>
+            = if(slider.straightDirection) makeLeftTrace(sliderY, bubbleDiam) else makeRightTrace(sliderY, bubbleDiam)
+
+    private fun makeRightTrace(sliderY: Float, bubbleDiam: Int) : ArrayList<Fragment> {
+        val res = ArrayList<Fragment>()
+        val size = 2 + Random.nextInt(2)
+        val spread = bubbleDiam / 4
+        for(i in 0 until size)
+            res.add(Fragment(slider.X + bubbleDiam, sliderY + 3f * spread + Random.nextInt(-spread / 2, spread / 2),
+                slider.X + bubbleDiam + spread / 2 + Random.nextInt(-spread / 4, spread / 4), sliderY + 3f * spread + Random.nextInt(-spread, spread),
+                round(1.3 * traceDuration).toLong(), Colour.BROWN, spread.toFloat() * Random.nextFloat() / 2))
+        fragments.addAll(res)
+        return res
+    }
+
+    private fun makeLeftTrace(sliderY: Float, bubbleDiam: Int): ArrayList<Fragment>  {
+        val res = ArrayList<Fragment>()
+        val size = 2 + Random.nextInt(2)
+        val spread = bubbleDiam / 4
+        for(i in 0 until size)
+            res.add(Fragment(slider.X, sliderY + 3f * spread + Random.nextInt(-spread / 2, spread / 2),
+                slider.X - spread / 2 + Random.nextInt(-spread / 4, spread / 4), sliderY + 3f * spread + Random.nextInt(-spread, spread),
+                round(1.3 * traceDuration).toLong(), Colour.BROWN, spread.toFloat() * Random.nextFloat() / 2))
+        fragments.addAll(res)
+        return res
     }
 
     companion object {
@@ -107,5 +135,6 @@ class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubb
         var sliderDuration = 1500L
         var ReceiverWidth = 0
         var SliderWidth = 0
+        var traceDuration = 60L
     }
 }

@@ -14,12 +14,15 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.animation.doOnRepeat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.scale
 import com.example.bublesortgame.Model.*
 import com.example.bublesortgame.Model.bubbles.Bubble
 import com.example.bublesortgame.Model.bubbles.StandartBubble
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
 import kotlin.math.abs
 import kotlin.math.sqrt
@@ -28,6 +31,7 @@ import kotlin.random.Random
 @RequiresApi(Build.VERSION_CODES.N)
 class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, private val game: Game = Game()) : View(context) {
 
+    private val animTimer: Timer = Timer()
     private val paints = mutableMapOf<Colour, Paint>()
     private val radiancePaints = mutableMapOf<Colour, Paint>()
     init {
@@ -41,6 +45,10 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
             p.color = it.color
             it to  p
         })
+        val p = Paint()
+        p.style = Paint.Style.FILL
+        p.color = Colour.BROWN.color
+        paints[Colour.BROWN] = p
         radiancePaints.clear()
         radiancePaints.putAll(paints.map {
             val p = Paint()
@@ -87,7 +95,7 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
     private val timer = Timer()
 
     private var bubbleDiametr = 0
-    private val animators: HashSet<Animator> = HashSet()
+    private val animators: MutableSet<Animator> = ConcurrentHashMap.newKeySet()
     private val bubbleAnims: ArrayList<Animator> = ArrayList()
     private val animatedReceivers = HashSet<Int>()
     private val radiancePaint : Paint = Paint()
@@ -107,7 +115,7 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
                     gameOver()
                 (context as AppCompatActivity).supportActionBar!!.title = "S ${game.scores} L ${game.lives}"
                 this@GameField.animateReceivers(b, res)
-                this@GameField.animateFragments(res)
+                this@GameField.animateFragments(res.fragments)
             }
             override fun onAnimationCancel(p0: Animator?) {}
             override fun onAnimationStart(p0: Animator?) {}
@@ -130,8 +138,8 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
         }
     }
 
-    fun animateFragments(res: Result) {
-        for(fr in res.fragments) {
+    fun animateFragments(fragments: ArrayList<Fragment>) {
+        for(fr in fragments) {
             val ax = ObjectAnimator.ofFloat(fr, Fragment::Y.name, fr.tY)
             val ay = ObjectAnimator.ofFloat(fr, Fragment::X.name, fr.tX)
             ax.duration = fr.duration
@@ -141,7 +149,7 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
             ay.addListener(object: AnimatorListener {
                 override fun onAnimationRepeat(p0: Animator?) {}
                 override fun onAnimationEnd(p0: Animator?) {
-                    Log.println(Log.DEBUG, "", "CONTAINS: ${game.fragments.contains(fr)}")
+                    //Log.println(Log.DEBUG, "", "CONTAINS: ${game.fragments.contains(fr)}")
                     game.fragments.remove(fr)
                 }
                 override fun onAnimationCancel(p0: Animator?) {}
@@ -177,6 +185,7 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
     fun close() {
         Game.bubbleDuration = 2000L
         Game.sliderDuration = 1500L
+        game.slider.straightDirection = true
     }
 
     private var receiverBitmap = resources.getDrawable(R.drawable.receiver,null).toBitmap()
@@ -194,7 +203,7 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
 
         for(fr in game.fragments)
             canvas!!.drawCircle(fr.X/* + fr.diam / 2*/, fr.Y,fr.diam, paints[fr.colour]!!)
-        canvas?.drawRect(game.slider.X ,height.toFloat() - sliderBitmap.height, game.slider.X + sliderBitmap.width,height.toFloat() - sliderBitmap.height + 25f, radiancePaint)//
+        canvas?.drawRect(game.slider.X ,getSliderY(), game.slider.X + sliderBitmap.width,height.toFloat() - sliderBitmap.height + 25f, radiancePaint)//
         canvas?.drawBitmap(sliderBitmap, game.slider.X ,height.toFloat() - sliderBitmap.height, null)
         for(b in game.bubbles) {
             canvas!!.drawCircle(b.X + bubbleDiametr / 2, b.Y,bubbleDiametr / 2f, if(b is StandartBubble) paints[b.colour]!! else radiancePaints[b.colour]!!)
@@ -211,6 +220,7 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
         animators.clear()
     }
 
+    private fun getSliderY(): Float = height.toFloat() - sliderBitmap.height
     override fun onSizeChanged(w: Int,h: Int,oldw: Int,oldh: Int) {
         super.onSizeChanged(w,h,oldw,oldh)
         initSliderAnim()
@@ -224,7 +234,7 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
 
     private fun initReceivers() {
         for(r in game.receivers)
-            r!!.X = r!!.number * bubbleDiametr * 2f + (bubbleDiametr * 2f - Game.ReceiverWidth) / 2f
+            r!!.X = r.number * bubbleDiametr * 2f + (bubbleDiametr * 2f - Game.ReceiverWidth) / 2f
     }
 
     companion object {
@@ -264,7 +274,6 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
         sliderAnimator!!.repeatMode = ValueAnimator.REVERSE
         sliderAnimator!!.repeatCount = ValueAnimator.INFINITE
         timer.schedule(object : TimerTask() {
-            //@RequiresApi(Build.VERSION_CODES.N)
             override fun run() {
                 if(!_isPaused) {
                     val bub = game.act(height - sliderBitmap.height.toFloat())
@@ -274,6 +283,18 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
                 this@GameField.invalidate()
             }
         }, 0, 17)
+        sliderAnimator!!.doOnRepeat {
+            /*Log.println(Log.DEBUG, "", game.slider.straightDirection.toString() +
+                    sliderAnimator!!.animatedFraction  )*/
+            game.slider.straightDirection = !game.slider.straightDirection
+        }
+        animTimer.schedule(object : TimerTask() {
+            override fun run() {
+                if(bubbleDiametr > 0)
+                     animateFragments(game.makeTrace(getSliderY(), bubbleDiametr))
+            }
+        }, 0, Game.traceDuration)
+
         sliderAnimator!!.start()
         sliderAnimator!!.pause()
         }
