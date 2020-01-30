@@ -19,6 +19,7 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.scale
 import com.example.bublesortgame.Model.*
 import com.example.bublesortgame.Model.bubbles.Bubble
+import com.example.bublesortgame.Model.bubbles.ExtraLifeBubble
 import com.example.bublesortgame.Model.bubbles.StandartBubble
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -59,13 +60,11 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
         }.toMap())
     }
 
-    private val backs = arrayOf(context!!.resources.getColor(R.color.colorAccent),
-        context.resources.getColor(R.color.back2), context.resources.getColor(R.color.back3))
+    private val backs = arrayOf(context!!.resources.getColor(R.color.colorAccent), Color.parseColor("#AAAAAA"), Color.parseColor("#FFFFFF"))
 
     init {
         this.setLayerType(LAYER_TYPE_SOFTWARE, null)
         setBackground()
-        //background = ColorDrawable(context!!.resources.getColor(R.color.colorAccent))
     }
 
     private fun setBackground() {
@@ -146,25 +145,17 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
             ay.duration = fr.duration
             animators.add(ax)
             animators.add(ay)
-            //frAn++
 
-            Log.println(Log.DEBUG, "", "ADD: ${fragments.size}")
+            //Log.println(Log.DEBUG, "", "ADD: ${fragments.size}")
             ay.addListener(object: AnimatorListener {
                 override fun onAnimationRepeat(p0: Animator?) {}
                 override fun onAnimationEnd(p0: Animator?) {
-                    //Log.println(Log.DEBUG, "", "CONTAINS: ${game.fragments.contains(fr)}")
                     game.fragments.remove(fr)
-                    //game.fragments.removeIf { it.id == fr.id }
-                    //frAn--
-                    //Log.println(Log.DEBUG, "", "DEL-REST: ${game.fragments.size}")
-                    //Log.println(Log.DEBUG, "", "LAST: ${game.fragments.firstOrNull()}")
-
                 }
                 override fun onAnimationCancel(p0: Animator?) {}
                 override fun onAnimationStart(p0: Animator?) {}
             } )
         }
-        //game.fragments.addAll(res)
     }
 
     private val sliderTimer = Timer()
@@ -178,7 +169,6 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
     val scores: Int
     get() = game.scores
 
-    //@RequiresApi(Build.VERSION_CODES.N)
     fun restartGame() {
         isPaused = false
         animators.clear()
@@ -199,7 +189,6 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
 
     private var receiverBitmap = resources.getDrawable(R.drawable.receiver,null).toBitmap()
     private var sliderBitmap = resources.getDrawable(R.drawable.slider,null).toBitmap()
-    //private val radianceBitmap = ColorDrawable(Color.BLACK).toBitmap(sliderBitmap.width, 1)
     private val textPaint = Paint()
     init {
         textPaint.textSize = 50f
@@ -213,22 +202,31 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
         for(a in animators)
             if(!a.isStarted)
                 a.start()
-        //animators.clear()
 
         for(fr in game.fragments)
-            canvas!!.drawCircle(fr.X/* + fr.diam / 2*/, fr.Y,fr.diam, paints[fr.colour]!!)
+            canvas!!.drawCircle(fr.X, fr.Y,fr.diam, paints[fr.colour]!!)
         canvas?.drawRect(game.slider.X ,getSliderY(), game.slider.X + sliderBitmap.width,height.toFloat() - sliderBitmap.height + 25f, radiancePaint)//
         canvas?.drawBitmap(sliderBitmap, game.slider.X ,height.toFloat() - sliderBitmap.height, null)
-        for(b in game.bubbles) {
-            canvas!!.drawCircle(b.X + bubbleDiametr / 2, b.Y,bubbleDiametr / 2f, if(b is StandartBubble) paints[b.colour]!! else radiancePaints[b.colour]!!)
-            canvas.drawText(b.label,b.X + bubbleDiametr / 2,b.Y + bubbleDiametr * 0.125f,textPaint)
-        }
+        for(b in game.bubbles)
+            drawBubble(b, canvas!!)
         for(r in game.receivers) {
             canvas!!.drawRect(r!!.X + 2, 0f,r.X + receiverBitmap.width, receiverBitmap.height.toFloat() ,
                 if(animatedReceivers.contains(r.number)) radiancePaints[r.colour]!! else paints[r.colour]!!)
             canvas.drawBitmap(receiverBitmap,r.X,0f,null)
         }
 
+    }
+
+    private fun drawBubble(b: Bubble, canvas: Canvas) {
+        canvas.drawCircle(b.X + bubbleDiametr / 2, b.Y,bubbleDiametr / 2f, if(b is StandartBubble) paints[b.colour]!! else radiancePaints[b.colour]!!)
+        if(b is ExtraLifeBubble) {
+            val path = Path()
+            path.moveTo(b.getCentralX(bubbleDiametr.toFloat()) - bubbleDiametr / 2, b.Y)
+            path.lineTo(b.getCentralX(bubbleDiametr.toFloat()) + bubbleDiametr / 2, b.Y)
+            path.lineTo(b.getCentralX(bubbleDiametr.toFloat()), b.getCentralY(bubbleDiametr.toFloat()) + 2 * bubbleDiametr)
+            canvas.drawPath(path, radiancePaints[b.colour]!!)
+        }
+        canvas.drawText(b.label,b.X + bubbleDiametr / 2,b.Y + bubbleDiametr * 0.125f,textPaint)
     }
 
     private fun getSliderY(): Float = height.toFloat() - sliderBitmap.height
@@ -260,8 +258,8 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
 
 
     private fun getTouchedBubble(x: Float,y: Float) : Bubble? =
-        game.bubbles.firstOrNull { abs(y - it.getCentralY(bubbleDiametr.toFloat())) <= bubbleDiametr * /*(if(Game.bubbleDuration < 1000) 2.1 else 2.4*/2.35
-                && abs(x - it.getCentralX(bubbleDiametr.toFloat())) <= bubbleDiametr * /*if(Game.bubbleDuration < 1000) 1.6 else 1.8*/2}
+        game.bubbles.firstOrNull { abs(y - it.getCentralY(bubbleDiametr.toFloat())) <= bubbleDiametr * 2.35
+                && abs(x - it.getCentralX(bubbleDiametr.toFloat())) <= bubbleDiametr * 2}
 
     init {
         setOnTouchListener{ v,e ->
@@ -271,8 +269,8 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
                 val b = this@GameField.getTouchedBubble(e.x, e.y)
                 b?.line = getNearestLine(e.x)?: b?.line!!
             }
-            else/*if(e.action == MotionEvent.ACTION_MOVE) */{
-                val b = this@GameField.getTouchingBubble(e.x, e.y )//if(e.action == MotionEvent.ACTION_MOVE) 2.35f else if(e.action == MotionEvent.ACTION_DOWN) 1.3f else 0f)
+            else {
+                val b = this@GameField.getTouchingBubble(e.x, e.y )
                 b?.line = getNearestLine(e.x)?: b?.line!!
             }
             return@setOnTouchListener true
@@ -295,30 +293,16 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
                 this@GameField.invalidate()
             }
         }, 0, 17)
-        sliderAnimator!!.doOnRepeat {
-            /*Log.println(Log.DEBUG, "", game.slider.straightDirection.toString() +
-                    sliderAnimator!!.animatedFraction  )*/
-            game.slider.straightDirection = !game.slider.straightDirection
-        }
+        sliderAnimator!!.doOnRepeat { game.slider.straightDirection = !game.slider.straightDirection }
         animTimer.schedule(object : TimerTask() {
             override fun run() {
-                //game.fragments.removeIf { !it.wasChanged }
                 if (!_isPaused && bubbleDiametr > 0) {
-                    ///animators.clear()
                     animators.removeIf { it.isStarted }
                     val f = game.makeTrace(getSliderY(), bubbleDiametr)
                     animateFragments(f)
-                    //Log.println(Log.DEBUG, "", "PRE-ADD: ${f.size}")
                 }
             }
         }, 0, Game.traceDuration)
-/**
-        timer.schedule(object : TimerTask() {
-            override fun run() {
-                //animators.clear()
-                game.fragments.removeIf { !it.wasChanged && it.Y > height - bubbleDiametr}
-            }
-        }, 0, 500)*/
         sliderAnimator!!.start()
         sliderAnimator!!.pause()
         }
