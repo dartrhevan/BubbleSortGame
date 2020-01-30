@@ -152,12 +152,12 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
             ay.addListener(object: AnimatorListener {
                 override fun onAnimationRepeat(p0: Animator?) {}
                 override fun onAnimationEnd(p0: Animator?) {
-                    Log.println(Log.DEBUG, "", "CONTAINS: ${game.fragments.contains(fr)}")
+                    //Log.println(Log.DEBUG, "", "CONTAINS: ${game.fragments.contains(fr)}")
                     game.fragments.remove(fr)
                     //game.fragments.removeIf { it.id == fr.id }
                     //frAn--
-                    Log.println(Log.DEBUG, "", "DEL-REST: ${game.fragments.size}")
-                    Log.println(Log.DEBUG, "", "LAST: ${game.fragments.firstOrNull()}")
+                    //Log.println(Log.DEBUG, "", "DEL-REST: ${game.fragments.size}")
+                    //Log.println(Log.DEBUG, "", "LAST: ${game.fragments.firstOrNull()}")
 
                 }
                 override fun onAnimationCancel(p0: Animator?) {}
@@ -211,8 +211,9 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
         super.onDraw(canvas)
 
         for(a in animators)
-            a.start()
-        animators.clear()
+            if(!a.isStarted)
+                a.start()
+        //animators.clear()
 
         for(fr in game.fragments)
             canvas!!.drawCircle(fr.X/* + fr.diam / 2*/, fr.Y,fr.diam, paints[fr.colour]!!)
@@ -303,18 +304,21 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
             override fun run() {
                 //game.fragments.removeIf { !it.wasChanged }
                 if (!_isPaused && bubbleDiametr > 0) {
+                    ///animators.clear()
+                    animators.removeIf { it.isStarted }
                     val f = game.makeTrace(getSliderY(), bubbleDiametr)
                     animateFragments(f)
-                    Log.println(Log.DEBUG, "", "PRE-ADD: ${f.size}")
+                    //Log.println(Log.DEBUG, "", "PRE-ADD: ${f.size}")
                 }
             }
         }, 0, Game.traceDuration)
-
+/**
         timer.schedule(object : TimerTask() {
             override fun run() {
+                //animators.clear()
                 game.fragments.removeIf { !it.wasChanged && it.Y > height - bubbleDiametr}
             }
-        }, 0, 100)
+        }, 0, 500)*/
         sliderAnimator!!.start()
         sliderAnimator!!.pause()
         }
