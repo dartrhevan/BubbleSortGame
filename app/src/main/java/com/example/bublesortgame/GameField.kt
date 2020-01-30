@@ -146,16 +146,25 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
             ay.duration = fr.duration
             animators.add(ax)
             animators.add(ay)
+            //frAn++
+
+            Log.println(Log.DEBUG, "", "ADD: ${fragments.size}")
             ay.addListener(object: AnimatorListener {
                 override fun onAnimationRepeat(p0: Animator?) {}
                 override fun onAnimationEnd(p0: Animator?) {
-                    //Log.println(Log.DEBUG, "", "CONTAINS: ${game.fragments.contains(fr)}")
+                    Log.println(Log.DEBUG, "", "CONTAINS: ${game.fragments.contains(fr)}")
                     game.fragments.remove(fr)
+                    //game.fragments.removeIf { it.id == fr.id }
+                    //frAn--
+                    Log.println(Log.DEBUG, "", "DEL-REST: ${game.fragments.size}")
+                    Log.println(Log.DEBUG, "", "LAST: ${game.fragments.firstOrNull()}")
+
                 }
                 override fun onAnimationCancel(p0: Animator?) {}
                 override fun onAnimationStart(p0: Animator?) {}
             } )
         }
+        //game.fragments.addAll(res)
     }
 
     private val sliderTimer = Timer()
@@ -201,6 +210,10 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
 
+        for(a in animators)
+            a.start()
+        animators.clear()
+
         for(fr in game.fragments)
             canvas!!.drawCircle(fr.X/* + fr.diam / 2*/, fr.Y,fr.diam, paints[fr.colour]!!)
         canvas?.drawRect(game.slider.X ,getSliderY(), game.slider.X + sliderBitmap.width,height.toFloat() - sliderBitmap.height + 25f, radiancePaint)//
@@ -210,14 +223,11 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
             canvas.drawText(b.label,b.X + bubbleDiametr / 2,b.Y + bubbleDiametr * 0.125f,textPaint)
         }
         for(r in game.receivers) {
-            canvas!!.drawRect(r!!.X + 2, 0f,r!!.X + receiverBitmap.width, receiverBitmap.height.toFloat() ,
-                if(animatedReceivers.contains(r.number)) radiancePaints[r!!.colour]!! else paints[r!!.colour]!!)
-            canvas.drawBitmap(receiverBitmap,r!!.X,0f,null)
+            canvas!!.drawRect(r!!.X + 2, 0f,r.X + receiverBitmap.width, receiverBitmap.height.toFloat() ,
+                if(animatedReceivers.contains(r.number)) radiancePaints[r.colour]!! else paints[r.colour]!!)
+            canvas.drawBitmap(receiverBitmap,r.X,0f,null)
         }
 
-        for(a in animators)
-            a.start()
-        animators.clear()
     }
 
     private fun getSliderY(): Float = height.toFloat() - sliderBitmap.height
@@ -238,6 +248,7 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
     }
 
     companion object {
+        //private var frAn= 0
         private fun getDistance(x1: Float, y1:Float, x2: Float, y2: Float): Float = sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
     }
 
@@ -290,11 +301,20 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
         }
         animTimer.schedule(object : TimerTask() {
             override fun run() {
-                if(bubbleDiametr > 0)
-                     animateFragments(game.makeTrace(getSliderY(), bubbleDiametr))
+                //game.fragments.removeIf { !it.wasChanged }
+                if (!_isPaused && bubbleDiametr > 0) {
+                    val f = game.makeTrace(getSliderY(), bubbleDiametr)
+                    animateFragments(f)
+                    Log.println(Log.DEBUG, "", "PRE-ADD: ${f.size}")
+                }
             }
         }, 0, Game.traceDuration)
 
+        timer.schedule(object : TimerTask() {
+            override fun run() {
+                game.fragments.removeIf { !it.wasChanged && it.Y > height - bubbleDiametr}
+            }
+        }, 0, 100)
         sliderAnimator!!.start()
         sliderAnimator!!.pause()
         }

@@ -2,6 +2,7 @@ package com.example.bublesortgame.Model
 
 import android.annotation.TargetApi
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import com.example.bublesortgame.Model.bubbles.Bubble
 import java.util.concurrent.ConcurrentHashMap
@@ -100,6 +101,8 @@ class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubb
                 slider.X + bubbleDiam + spread / 2 + Random.nextInt(-spread / 4, spread / 4), sliderY + 3f * spread + Random.nextInt(-spread, spread),
                 round(1.3 * traceDuration).toLong(), Colour.BROWN, spread.toFloat() * Random.nextFloat() / 2))
         fragments.addAll(res)
+
+        //Log.println(Log.DEBUG, "", "RESTIN: ${fragments.size}")
         return res
     }
 
