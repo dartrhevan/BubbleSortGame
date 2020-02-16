@@ -110,7 +110,7 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
             @RequiresApi(Build.VERSION_CODES.N)
             override fun onAnimationEnd(p0: Animator?) {
                 val res = game.acceptBubble(b, bubbleDiametr)
-                if(res.endGame)
+                if(res.endGame && !_isPaused)
                     gameOver()
                 (context as AppCompatActivity).supportActionBar!!.title = "S ${game.scores} L ${game.lives}"
                 this@GameField.animateReceivers(b, res)
