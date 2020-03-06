@@ -29,7 +29,6 @@ import kotlin.math.abs
 import kotlin.math.sqrt
 import kotlin.random.Random
 
-@RequiresApi(Build.VERSION_CODES.N)
 class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, private val game: Game = Game()) : View(context) {
 
     private val animTimer: Timer = Timer()

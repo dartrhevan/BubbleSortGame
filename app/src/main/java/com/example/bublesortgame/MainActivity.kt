@@ -17,7 +17,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var pauseButton: MenuItem
     private lateinit var gameField: GameField
-    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //setContentView(R.layout.activity_main)
@@ -57,7 +56,6 @@ class MainActivity : AppCompatActivity() {
          item.icon = if(!gameField.isPaused) pauseDrawable else resumeDrawable
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     fun restart(item: MenuItem) {
         gameField.gameOver(false)
         gameField.restartGame()
@@ -70,7 +68,6 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     override fun onBackPressed() { // your code.
         super.onBackPressed()
         gameField.close()
