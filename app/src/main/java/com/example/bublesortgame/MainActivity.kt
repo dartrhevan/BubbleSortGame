@@ -1,22 +1,24 @@
 package com.example.bublesortgame
 
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.example.bublesortgame.results.ResultsDialog
+import kotlinx.android.synthetic.main.activity_start.*
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var pauseButton: MenuItem
     private lateinit var gameField: GameField
+
+    private val int = Intent(this, AudioService::class.java)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //setContentView(R.layout.activity_main)
@@ -37,6 +39,7 @@ class MainActivity : AppCompatActivity() {
         //supportActionBar!!.title = Html.fromHtml("<font color=\"red\">Scores: 0 Lives: 5</font>")//"Scores: 0 Lives: 5"
         gameField.isPaused = true
 
+        startService(intent)
 
     }
 
@@ -56,6 +59,7 @@ class MainActivity : AppCompatActivity() {
          item.icon = if(!gameField.isPaused) pauseDrawable else resumeDrawable
     }
 
+    //@RequiresApi(Build.VERSION_CODES.N)
     fun restart(item: MenuItem) {
         gameField.gameOver(false)
         gameField.restartGame()
@@ -68,6 +72,7 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
+    //@RequiresApi(Build.VERSION_CODES.N)
     override fun onBackPressed() { // your code.
         super.onBackPressed()
         gameField.close()
