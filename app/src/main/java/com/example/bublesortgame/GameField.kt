@@ -289,7 +289,9 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
                     if(bub != null)
                         addBubbleAnim(bub)
                 }
-                this@GameField.invalidate()
+                (this@GameField.context as MainActivity).runOnUiThread {
+                    this@GameField.invalidate()
+                }
             }
         }, 0, 17)
         sliderAnimator!!.doOnRepeat { game.slider.straightDirection = !game.slider.straightDirection }

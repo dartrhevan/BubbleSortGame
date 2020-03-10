@@ -10,8 +10,9 @@ import kotlin.collections.HashSet
 import kotlin.math.abs
 import kotlin.math.round
 import kotlin.random.Random
-class Game constructor(var scores: Int = 0,var lives: Int = 5,val bubbles: MutableSet<Bubble> =  ConcurrentHashMap.newKeySet(),//: MutableSet<Bubble> = ConcurrentHashMap.newKeySet(),
-                                                           val fragments: MutableSet<Fragment> = ConcurrentHashMap.newKeySet())//: CopyOnWriteArrayList<Bubble> = CopyOnWriteArrayList())//ConcurrentLinkedDeque
+
+class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubble> =  ConcurrentHashMap.newKeySet(),//: MutableSet<Bubble> = ConcurrentHashMap.newKeySet(),
+           val fragments: MutableSet<Fragment> = ConcurrentHashMap.newKeySet())//: CopyOnWriteArrayList<Bubble> = CopyOnWriteArrayList())//ConcurrentLinkedDeque
 {
 
     val receivers =  Array<Receiver?>(4) {null}
