@@ -15,13 +15,47 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/elementStyle"
+            android:textColor="#000"
             android:text="@string/difficult"/>
 
         <RadioGroup
+            android:id="@+id/dif"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+            <RadioButton
+                android:id="@+id/easyBut"
+                android:onClick="onDifficultyChecked"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/elementStyle"
+                android:text="@string/easyDifficulty"/>
 
+            <RadioButton
+                android:id="@+id/standBut"
+
+                android:onClick="onDifficultyChecked"
+                style="@style/elementStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/standardDifficulty" />
+            <RadioButton
+                android:id="@+id/hardBut"
+                android:onClick="onDifficultyChecked"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/elementStyle"
+                android:text="@string/hardDifficulty"/>
         </RadioGroup>
+
+        <Switch
+            android:onClick="onMute"
+            android:id="@+id/mute"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/elementStyle"
+            android:textColor="#000"
+            android:text="@string/mute"/>
 
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

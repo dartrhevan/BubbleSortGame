@@ -137,7 +137,7 @@ class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubb
         val sliderDuration : Long
             get() = currentDifficult.sliderDuration
 
-        var chosenDifficult = Difficult.getStandardDifficult()
+        var chosenDifficult = Difficulty.getStandardDifficulty()
         var currentDifficult = chosenDifficult
         var ReceiverWidth = 0
         var SliderWidth = 0

@@ -65,7 +65,8 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
         }.toMap())
     }
 
-    private val backs = arrayOf(context!!.resources.getColor(R.color.colorAccent), Color.parseColor("#AAAAAA"), Color.parseColor("#FFFFFF"))
+    private val backs = arrayOf(context!!.resources.getColor(R.color.colorAccent),
+        Color.parseColor("#AAAAAA"), Color.parseColor("#FFFFFF"))
 
     init {
         this.setLayerType(LAYER_TYPE_SOFTWARE, null)
@@ -87,12 +88,12 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
             sliderAnimator?.pause()
             for(i in bubbleAnims)
                 i.pause()
-            if (ambientMediaPlayer.isPlaying)
+            if (!mute && ambientMediaPlayer.isPlaying)
                 ambientMediaPlayer.pause()
         }
         else
         {
-            if (!ambientMediaPlayer.isPlaying)
+            if (!mute && !ambientMediaPlayer.isPlaying)
                 ambientMediaPlayer.start()
             sliderAnimator!!.resume()
             for(i in bubbleAnims)
@@ -256,7 +257,9 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
 
     companion object {
         //private var frAn= 0
-        private fun getDistance(x1: Float, y1:Float, x2: Float, y2: Float): Float = sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
+        var mute = false
+        private fun getDistance(x1: Float, y1:Float, x2: Float, y2: Float): Float
+                = sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
     }
 
     private fun getNearestLine(x: Float) : Int? = game.receivers.minBy { abs(x - it!!.centerX) }?.number
