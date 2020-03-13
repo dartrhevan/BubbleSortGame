@@ -191,8 +191,7 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
     }
 
     fun close() {
-        Game.bubbleDuration = 2000L
-        Game.sliderDuration = 1500L
+        Game.currentDifficult = Game.chosenDifficult
         game.slider.straightDirection = true
     }
 

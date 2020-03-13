@@ -1,18 +1,13 @@
 package com.example.bublesortgame.Model
 
-import android.annotation.TargetApi
-import android.os.Build
-import android.util.Log
-import androidx.annotation.RequiresApi
 import com.example.bublesortgame.Model.bubbles.Bubble
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.HashSet
 import kotlin.math.abs
 import kotlin.math.round
 import kotlin.random.Random
 
-class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubble> =  ConcurrentHashMap.newKeySet(),//: MutableSet<Bubble> = ConcurrentHashMap.newKeySet(),
-           val fragments: MutableSet<Fragment> = ConcurrentHashMap.newKeySet())//: CopyOnWriteArrayList<Bubble> = CopyOnWriteArrayList())//ConcurrentLinkedDeque
+class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubble> =  ConcurrentHashMap.newKeySet(),
+           val fragments: MutableSet<Fragment> = ConcurrentHashMap.newKeySet())
 {
 
     val receivers =  Array<Receiver?>(4) {null}
@@ -57,8 +52,9 @@ class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubb
     get() = _colours
 
     fun restart() {
-        bubbleDuration = 2000L
-        sliderDuration = 1500L
+        /*bubbleDuration = 2000L
+        sliderDuration = 1500L*/
+        currentDifficult = chosenDifficult
         bubbles.clear()
         slider.X = 0f
         scores = 0
@@ -75,16 +71,18 @@ class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubb
     }
 
     private fun speedUp() {
-        if(bubbleDuration > 1000L) {
-            bubbleDuration = round(bubbleDuration * 0.9).toLong()
-            sliderDuration = round(sliderDuration * 0.9).toLong()
-        } else slider.megaBoost = true
+        if(currentDifficult.bubbleDuration > 800L) {
+            currentDifficult.bubbleDuration = round(currentDifficult.bubbleDuration * 0.9).toLong()
+            currentDifficult.sliderDuration = round(currentDifficult.sliderDuration * 0.9).toLong()
+            currentDifficult.delta++
+        }
+        else slider.megaBoost = true
     }
 
     private fun getReceiver() : Receiver?
     {
         val r = receivers.minBy { abs(slider.centerX - it!!.centerX) }!!
-        return if(abs(slider.centerX - r.centerX) < DELTA) r else null
+        return if(abs(slider.centerX - r.centerX) < currentDifficult.delta) r else null
     }
 
     fun makeTrace(sliderY: Float, bubbleDiam: Int) : ArrayList<Fragment>
@@ -99,8 +97,6 @@ class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubb
                 slider.X + bubbleDiam + spread / 2 + Random.nextInt(-spread / 4, spread / 4), sliderY + 3f * spread + Random.nextInt(-spread, spread),
                 round(1.3 * traceDuration).toLong(), Colour.BROWN, spread.toFloat() * Random.nextFloat() / 2))
         fragments.addAll(res)
-
-        //Log.println(Log.DEBUG, "", "RESTIN: ${fragments.size}")
         return res
     }
 
@@ -130,12 +126,23 @@ class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubb
         }
 
         private var speedUpFrequency = 10
-        private const val DELTA = 5
-        const val bubbleStandardDuration = 2000L
+        /*private const val bubbleStandardDuration = 2000L
         var bubbleDuration = bubbleStandardDuration
         var sliderDuration = 1500L
+        private var DELTA = 4
+         */
+        val bubbleDuration : Long
+            get() = currentDifficult.bubbleDuration
+
+        val sliderDuration : Long
+            get() = currentDifficult.sliderDuration
+
+        var chosenDifficult = Difficult.getStandardDifficult()
+        var currentDifficult = chosenDifficult
         var ReceiverWidth = 0
         var SliderWidth = 0
         var traceDuration = 60L
+
+
     }
 }

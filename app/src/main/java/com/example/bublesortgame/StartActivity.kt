@@ -23,6 +23,7 @@ class StartActivity : AppCompatActivity() {
             Snackbar.make(v, e.message!!, Snackbar.LENGTH_LONG)
         }
     }
+    fun openSettings(v : View) = startActivity(Intent(this, SettingsActivity::class.java))
     fun exitGame(v: View) = finish()
     fun openRecords(v: View) = startActivity(Intent(this, RecordsActivity::class.java))
 }

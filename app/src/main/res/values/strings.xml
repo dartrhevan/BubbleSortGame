@@ -6,4 +6,5 @@
     <string name="exit">exit</string>
     <string name="settings">settings</string>
     <string name="title_activity_settings">SettingsActivity</string>
+    <string name="difficult">Difficult:</string>
 </resources>

@@ -47,6 +47,7 @@
         style="@style/buttonStyle"
         android:layout_width="130dp"
         android:layout_height="58dp"
+        android:onClick="openSettings"
         android:text="@string/settings"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
