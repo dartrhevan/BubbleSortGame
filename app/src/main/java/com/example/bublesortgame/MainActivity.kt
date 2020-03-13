@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var pauseButton: MenuItem
     private lateinit var gameField: GameField
-    private lateinit var int : Intent //= Intent(this, AudioService::class.java)
+    //private lateinit var int : Intent //= Intent(this, AudioService::class.java)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //setContentView(R.layout.activity_main)
@@ -37,8 +37,8 @@ class MainActivity : AppCompatActivity() {
         supportActionBar!!.setBackgroundDrawable(ColorDrawable(Color.parseColor("#444444")))
         //supportActionBar!!.title = Html.fromHtml("<font color=\"red\">Scores: 0 Lives: 5</font>")//"Scores: 0 Lives: 5"
         gameField.isPaused = true
-        int = Intent(this, AudioService::class.java)
-        startService(int)
+        //int = Intent(this, AudioService::class.java)
+        //startService(int)
 
     }
 
@@ -74,10 +74,10 @@ class MainActivity : AppCompatActivity() {
         super.onBackPressed()
         gameField.close()
     }
-
+/*
     override fun onDestroy() {
         super.onDestroy()
         stopService(int)
-    }
+    }*/
 }
 

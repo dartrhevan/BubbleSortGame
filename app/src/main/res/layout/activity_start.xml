@@ -4,14 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_gravity="center"
     android:background="@color/colorAccent"
     tools:context=".StartActivity">
 
     <Button
         android:id="@+id/start"
+        android:layout_width="87dp"
         style="@style/buttonStyle"
         android:onClick="startGame"
-        android:text="start"
+        android:text="@string/start"
         app:layout_constraintBottom_toTopOf="@+id/records"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -21,11 +23,11 @@
         android:id="@+id/records"
         style="@style/buttonStyle"
         android:layout_width="130dp"
-        android:layout_height="55dp"
+        android:layout_height="58dp"
         android:onClick="openRecords"
-        android:text="records"
+        android:text="@string/records"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/start"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -33,11 +35,22 @@
         android:id="@+id/exit"
         style="@style/buttonStyle"
         android:onClick="exitGame"
-        android:text="exit"
+        android:layout_width="87dp"
+        android:text="@string/exit"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/records" />
+
+    <Button
+        android:id="@+id/settings"
+        style="@style/buttonStyle"
+        android:layout_width="130dp"
+        android:layout_height="58dp"
+        android:text="@string/settings"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/start"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

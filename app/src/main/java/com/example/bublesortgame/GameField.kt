@@ -8,6 +8,7 @@ import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
+import android.media.MediaPlayer
 import android.os.Build
 import android.util.Log
 import android.view.MotionEvent
@@ -31,6 +32,11 @@ import kotlin.random.Random
 
 class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, private val game: Game = Game()) : View(context) {
 
+    private val ambientMediaPlayer: MediaPlayer = MediaPlayer.create(context, R.raw.soundtrack)
+    init {
+        ambientMediaPlayer.isLooping = true
+        //ambientMediaPlayer.start()
+    }
     private val animTimer: Timer = Timer()
     private val paints = mutableMapOf<Colour, Paint>()
     private val radiancePaints = mutableMapOf<Colour, Paint>()
@@ -81,9 +87,13 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
             sliderAnimator?.pause()
             for(i in bubbleAnims)
                 i.pause()
+            if (ambientMediaPlayer.isPlaying)
+                ambientMediaPlayer.pause()
         }
         else
         {
+            if (!ambientMediaPlayer.isPlaying)
+                ambientMediaPlayer.start()
             sliderAnimator!!.resume()
             for(i in bubbleAnims)
                 i.resume()
