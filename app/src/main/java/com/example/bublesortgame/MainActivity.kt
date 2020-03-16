@@ -1,5 +1,6 @@
 package com.example.bublesortgame
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.graphics.Color
@@ -17,10 +18,11 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var pauseButton: MenuItem
     private lateinit var gameField: GameField
-    //private lateinit var int : Intent //= Intent(this, AudioService::class.java)
+
+    @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //setContentView(R.layout.activity_main)
+
         gameField = GameField(this,{ s ->
             pauseButton.isVisible = false
             if(s) {
@@ -28,18 +30,14 @@ class MainActivity : AppCompatActivity() {
                 dialog.show()
             }
         })
-        //gameField.background = ColorDrawable(Color.parseColor("#AAAAAA"))
+
         setContentView(gameField)
         pauseDrawable = resources.getDrawable(android.R.drawable.ic_media_pause)
         resumeDrawable = resources.getDrawable(android.R.drawable.ic_media_play)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         supportActionBar!!.title = "S 0 L 5"
         supportActionBar!!.setBackgroundDrawable(ColorDrawable(Color.parseColor("#444444")))
-        //supportActionBar!!.title = Html.fromHtml("<font color=\"red\">Scores: 0 Lives: 5</font>")//"Scores: 0 Lives: 5"
         gameField.isPaused = true
-        //int = Intent(this, AudioService::class.java)
-        //startService(int)
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -70,14 +68,14 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    override fun onBackPressed() { // your code.
+    override fun onBackPressed() {
         super.onBackPressed()
         gameField.close()
     }
-/*
+
     override fun onDestroy() {
         super.onDestroy()
-        stopService(int)
-    }*/
+        gameField.mediaPlayer.stop()
+    }
 }
 

@@ -17,7 +17,7 @@ class RecordsActivity : AppCompatActivity() {
         val title = TextView(this)
         title.text = "Records"
         val layout = makeRecordsView(this, db.getRecords())
-        layout.background = ColorDrawable(this.resources.getColor(R.color.colorAccent))
+        layout.background = ColorDrawable(this.resources.getColor(R.color.background))
 
         setContentView(layout)
         supportActionBar!!.title = "Records"

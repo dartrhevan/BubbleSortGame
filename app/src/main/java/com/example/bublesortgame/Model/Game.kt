@@ -13,6 +13,7 @@ class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubb
     val receivers =  Array<Receiver?>(4) {null}
 
     init {
+        currentDifficult = chosenDifficult.copy()
         initReceivers()
     }
 
@@ -52,8 +53,6 @@ class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubb
     get() = _colours
 
     fun restart() {
-        /*bubbleDuration = 2000L
-        sliderDuration = 1500L*/
         currentDifficult = chosenDifficult
         bubbles.clear()
         slider.X = 0f
@@ -95,7 +94,7 @@ class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubb
         for(i in 0 until size)
             res.add(Fragment(slider.X + bubbleDiam, sliderY + 3f * spread + Random.nextInt(-spread / 2, spread / 2),
                 slider.X + bubbleDiam + spread / 2 + Random.nextInt(-spread / 4, spread / 4), sliderY + 3f * spread + Random.nextInt(-spread, spread),
-                round(1.3 * traceDuration).toLong(), Colour.BROWN, spread.toFloat() * Random.nextFloat() / 2))
+                round(1.3 * _traceDuration).toLong(), Colour.BROWN, spread.toFloat() * Random.nextFloat() / 2))
         fragments.addAll(res)
         return res
     }
@@ -107,7 +106,7 @@ class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubb
         for(i in 0 until size)
             res.add(Fragment(slider.X, sliderY + 3f * spread + Random.nextInt(-spread / 2, spread / 2),
                 slider.X - spread / 2 + Random.nextInt(-spread / 4, spread / 4), sliderY + 3f * spread + Random.nextInt(-spread, spread),
-                round(1.3 * traceDuration).toLong(), Colour.BROWN, spread.toFloat() * Random.nextFloat() / 2))
+                round(1.3 * _traceDuration).toLong(), Colour.BROWN, spread.toFloat() * Random.nextFloat() / 2))
         fragments.addAll(res)
         return res
     }
@@ -126,11 +125,7 @@ class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubb
         }
 
         private var speedUpFrequency = 10
-        /*private const val bubbleStandardDuration = 2000L
-        var bubbleDuration = bubbleStandardDuration
-        var sliderDuration = 1500L
-        private var DELTA = 4
-         */
+
         val bubbleDuration : Long
             get() = currentDifficult.bubbleDuration
 
@@ -138,10 +133,12 @@ class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubb
             get() = currentDifficult.sliderDuration
 
         var chosenDifficult = Difficulty.getStandardDifficulty()
-        var currentDifficult = chosenDifficult
-        var ReceiverWidth = 0
-        var SliderWidth = 0
-        var traceDuration = 60L
+        var currentDifficult = chosenDifficult.copy()
+        var receiverWidth = 0
+        var sliderWidth = 0
+        private var _traceDuration = 60L
+        val traceDuration
+        get() = _traceDuration
 
 
     }

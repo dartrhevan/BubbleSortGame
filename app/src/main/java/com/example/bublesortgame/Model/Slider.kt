@@ -31,6 +31,6 @@ data class Slider(val game: Game, var X: Float = 0f, var straightDirection: Bool
 
     var megaBoost = false
     val centerX: Float
-    get() = X + Game.SliderWidth / 2
+    get() = X + Game.sliderWidth / 2
     private var lastLine: Int = -1
 }

@@ -1,6 +1,6 @@
 package com.example.bublesortgame.Model
 
-data class Difficulty private constructor(var bubbleDuration : Long, var sliderDuration : Long, var delta : Int ){
+data class Difficulty private constructor(var bubbleDuration : Long, var sliderDuration : Long, var delta : Int ) : Cloneable {
     companion object {
         fun getEasyDifficulty() = Difficulty(2500L, 2000L, 4 )
 

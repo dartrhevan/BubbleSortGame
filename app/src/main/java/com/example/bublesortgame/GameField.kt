@@ -6,11 +6,9 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.*
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
 import android.media.MediaPlayer
 import android.os.Build
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.RequiresApi
@@ -32,10 +30,11 @@ import kotlin.random.Random
 
 class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, private val game: Game = Game()) : View(context) {
 
-    private val ambientMediaPlayer: MediaPlayer = MediaPlayer.create(context, R.raw.soundtrack)
+    val mediaPlayer
+    get() = _mediaPlayer
+    private val _mediaPlayer: MediaPlayer = MediaPlayer.create(context, R.raw.soundtrack)
     init {
-        ambientMediaPlayer.isLooping = true
-        //ambientMediaPlayer.start()
+        _mediaPlayer.isLooping = true
     }
     private val animTimer: Timer = Timer()
     private val paints = mutableMapOf<Colour, Paint>()
@@ -65,7 +64,7 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
         }.toMap())
     }
 
-    private val backs = arrayOf(context!!.resources.getColor(R.color.colorAccent),
+    private val backs = arrayOf(context!!.resources.getColor(R.color.background),
         Color.parseColor("#AAAAAA"), Color.parseColor("#FFFFFF"))
 
     init {
@@ -75,7 +74,6 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
 
     private fun setBackground() {
         background = ColorDrawable(backs[Random.nextInt(backs.size)])
-
     }
 
     private var sliderAnimator: ObjectAnimator? = null
@@ -88,13 +86,13 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
             sliderAnimator?.pause()
             for(i in bubbleAnims)
                 i.pause()
-            if (!mute && ambientMediaPlayer.isPlaying)
-                ambientMediaPlayer.pause()
+            if (!mute && _mediaPlayer.isPlaying)
+                _mediaPlayer.pause()
         }
         else
         {
-            if (!mute && !ambientMediaPlayer.isPlaying)
-                ambientMediaPlayer.start()
+            if (!mute && !_mediaPlayer.isPlaying)
+                _mediaPlayer.start()
             sliderAnimator!!.resume()
             for(i in bubbleAnims)
                 i.resume()
@@ -156,7 +154,6 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
             animators.add(ax)
             animators.add(ay)
 
-            //Log.println(Log.DEBUG, "", "ADD: ${fragments.size}")
             ay.addListener(object: AnimatorListener {
                 override fun onAnimationRepeat(p0: Animator?) {}
                 override fun onAnimationEnd(p0: Animator?) {
@@ -192,7 +189,7 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
     }
 
     fun close() {
-        Game.currentDifficult = Game.chosenDifficult
+        Game.currentDifficult = Game.chosenDifficult.copy()
         game.slider.straightDirection = true
     }
 
@@ -244,19 +241,18 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
         initSliderAnim()
         bubbleDiametr = width / 8
         sliderBitmap = sliderBitmap.scale(bubbleDiametr, bubbleDiametr)
-        Game.SliderWidth = sliderBitmap.width
-        Game.ReceiverWidth = Game.SliderWidth
-        receiverBitmap = receiverBitmap.scale(Game.SliderWidth, Game.SliderWidth)
+        Game.sliderWidth = sliderBitmap.width
+        Game.receiverWidth = Game.sliderWidth
+        receiverBitmap = receiverBitmap.scale(Game.sliderWidth, Game.sliderWidth)
         initReceivers()
     }
 
     private fun initReceivers() {
         for(r in game.receivers)
-            r!!.X = r.number * bubbleDiametr * 2f + (bubbleDiametr * 2f - Game.ReceiverWidth) / 2f
+            r!!.X = r.number * bubbleDiametr * 2f + (bubbleDiametr * 2f - Game.receiverWidth) / 2f
     }
 
     companion object {
-        //private var frAn= 0
         var mute = false
         private fun getDistance(x1: Float, y1:Float, x2: Float, y2: Float): Float
                 = sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
