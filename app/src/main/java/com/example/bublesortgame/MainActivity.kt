@@ -1,7 +1,6 @@
 package com.example.bublesortgame
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -11,7 +10,6 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.example.bublesortgame.results.ResultsDialog
-import kotlinx.android.synthetic.main.activity_start.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -50,10 +48,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var resumeDrawable: Drawable
     private lateinit var pauseDrawable: Drawable
 
+    fun pause(item: MenuItem) = pause()
 
-    fun pause(item: MenuItem) {
-         gameField.isPaused = !gameField.isPaused
-         item.icon = if(!gameField.isPaused) pauseDrawable else resumeDrawable
+    private fun pause(value : Boolean? = null) {
+         gameField.isPaused = value ?: !gameField.isPaused
+         pauseButton.icon = if(!gameField.isPaused) pauseDrawable else resumeDrawable
     }
 
     fun restart(item: MenuItem) {
@@ -77,5 +76,12 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         gameField.mediaPlayer.stop()
     }
+
+    override fun onPause() {
+        super.onPause()
+        pause(true)
+        //gameField.isPaused = true
+    }
+
 }
 

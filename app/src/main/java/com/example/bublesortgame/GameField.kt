@@ -93,7 +93,7 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
         {
             if (!mute && !_mediaPlayer.isPlaying)
                 _mediaPlayer.start()
-            sliderAnimator!!.resume()
+            sliderAnimator?.resume()
             for(i in bubbleAnims)
                 i.resume()
         }
@@ -253,7 +253,7 @@ class GameField(context: Context?, private val onGameOver: (s:Boolean) -> Unit, 
     }
 
     companion object {
-        var mute = false
+        var mute = true
         private fun getDistance(x1: Float, y1:Float, x2: Float, y2: Float): Float
                 = sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
     }

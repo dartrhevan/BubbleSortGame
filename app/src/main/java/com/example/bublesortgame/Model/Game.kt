@@ -53,7 +53,7 @@ class Game(var scores: Int = 0, var lives: Int = 5, val bubbles: MutableSet<Bubb
     get() = _colours
 
     fun restart() {
-        currentDifficult = chosenDifficult
+        currentDifficult = chosenDifficult.copy()
         bubbles.clear()
         slider.X = 0f
         scores = 0

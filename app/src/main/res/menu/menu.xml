@@ -19,7 +19,7 @@
     <item
         android:icon="@android:drawable/ic_media_play"
         android:onClick="pause"
-        android:id="@+id/button"
+        android:id="@+id/pauseButton"
         android:title=""
         app:showAsAction="ifRoom">
     </item>
