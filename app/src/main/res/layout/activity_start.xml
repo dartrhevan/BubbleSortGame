@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="center"
+    android:gravity="center"
+    android:orientation="vertical"
     tools:context=".StartActivity">
 
     <Button
@@ -12,11 +13,8 @@
         android:layout_width="87dp"
         style="@style/buttonStyle"
         android:onClick="startGame"
-        android:text="@string/start"
-        app:layout_constraintBottom_toTopOf="@+id/records"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_margin="15dp"
+        android:text="@string/start" />
 
     <Button
         android:id="@+id/records"
@@ -24,22 +22,8 @@
         android:layout_width="130dp"
         android:layout_height="58dp"
         android:onClick="openRecords"
-        android:text="@string/records"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/start"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/exit"
-        style="@style/buttonStyle"
-        android:onClick="exitGame"
-        android:layout_width="87dp"
-        android:text="@string/exit"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/records" />
+        android:layout_margin="15dp"
+        android:text="@string/records" />
 
     <Button
         android:id="@+id/settings"
@@ -48,9 +32,15 @@
         android:layout_height="58dp"
         android:onClick="openSettings"
         android:text="@string/settings"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/start"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_margin="15dp" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <Button
+        android:id="@+id/exit"
+        style="@style/buttonStyle"
+        android:onClick="exitGame"
+        android:layout_width="87dp"
+        android:text="@string/exit"
+        android:layout_margin="15dp" />
+
+
+</LinearLayout>
